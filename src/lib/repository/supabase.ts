@@ -229,7 +229,18 @@ class SupabaseRepository implements Repository {
   async getSiteSettings(): Promise<SiteSettings> {
     const result = await this.client.from("site_settings").select("*").limit(1).maybeSingle();
     if (result.error) throw new Error(`getSiteSettings: ${result.error.message}`);
-    if (result.data) return result.data as SiteSettings;
+    if (result.data) {
+      const settings = result.data as SiteSettings;
+      if (settings.celebrity_name === "Keanu Reeves") {
+        return this.updateSiteSettings({
+          celebrity_name: "Morgan Wallen",
+          tagline:
+            settings.tagline ||
+            "Official fan experience — giveaways, meet & greets, and more.",
+        });
+      }
+      return settings;
+    }
 
     const id = uuidv4();
     const insert = await this.client
