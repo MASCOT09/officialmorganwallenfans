@@ -4,6 +4,7 @@ import { Suspense, useActionState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { loginAction } from "@/actions/auth";
+import { PasswordInput } from "@/components/PasswordInput";
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -37,7 +38,7 @@ function LoginForm() {
         </div>
         <div>
           <label className="label-text">Password</label>
-          <input name="password" type="password" required className="input-field" />
+          <PasswordInput autoComplete="current-password" />
         </div>
         {state.error && <p className="text-sm text-red-400">{state.error}</p>}
         <button type="submit" disabled={pending} className="btn-primary w-full">

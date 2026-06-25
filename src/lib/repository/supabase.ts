@@ -232,12 +232,19 @@ class SupabaseRepository implements Repository {
     if (result.data) {
       const settings = result.data as SiteSettings;
       if (settings.celebrity_name === "Keanu Reeves") {
-        return this.updateSiteSettings({
-          celebrity_name: "Morgan Wallen",
-          tagline:
-            settings.tagline ||
-            "Official fan experience — giveaways, meet & greets, and more.",
-        });
+        const fixed = await this.client
+          .from("site_settings")
+          .update({
+            celebrity_name: "Morgan Wallen",
+            tagline:
+              settings.tagline ||
+              "Official fan experience — giveaways, meet & greets, and more.",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", settings.id)
+          .select()
+          .single();
+        return throwIfError("getSiteSettings fix celebrity name", fixed) as SiteSettings;
       }
       return settings;
     }
