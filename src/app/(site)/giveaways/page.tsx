@@ -4,7 +4,7 @@ import { getSession } from "@/lib/auth";
 import { canEnterGiveaways } from "@/lib/membership";
 import { enterGiveawayAction } from "@/actions/fan";
 import { MembershipGateButton } from "@/components/MembershipGateButton";
-import { PostImage } from "@/components/PostImage";
+import { PostImageGallery } from "@/components/PostImageGallery";
 import { FormSubmitButton } from "@/components/FormSubmitButton";
 
 async function enterGiveaway(formData: FormData) {
@@ -32,7 +32,7 @@ export default async function GiveawaysPage() {
         <div className="mt-10 grid gap-6">
           {giveaways.map((g) => (
             <div key={g.id} className="glass-card p-6">
-              {g.image_url && <PostImage src={g.image_url} alt={g.title} className="mb-4 max-h-48 w-full object-cover" />}
+              <PostImageGallery entity={g} alt={g.title} className="mb-4 max-h-48 w-full object-cover" />
               <h2 className="font-display text-xl">{g.title}</h2>
               <p className="mt-2 text-sm text-muted">{g.description}</p>
               {g.ends_at && (

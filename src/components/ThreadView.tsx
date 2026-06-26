@@ -7,7 +7,7 @@ import { adminReplyAction } from "@/actions/admin";
 import type { Message } from "@/lib/types";
 import { formatLastSeen } from "@/lib/membership";
 import { ImageUploadField } from "@/components/ImageUploadField";
-import { PostImage } from "@/components/PostImage";
+import { PostImageGallery } from "@/components/PostImageGallery";
 
 interface ThreadViewProps {
   threadId: string;
@@ -33,8 +33,9 @@ export function ThreadView({
     const form = e.currentTarget;
     const formData = new FormData(form);
     const body = String(formData.get("body") ?? "").trim();
-    const image = formData.get("image");
-    const hasImage = image instanceof File && image.size > 0;
+    const hasImage = formData
+      .getAll("images")
+      .some((item) => item instanceof File && item.size > 0);
     if ((!body && !hasImage) || pending) return;
 
     setError(null);
@@ -74,7 +75,7 @@ export function ThreadView({
             className={m.sender_role === "fan" ? "chat-bubble-fan" : "chat-bubble-admin"}
           >
             {m.body.trim() && <p>{m.body}</p>}
-            {m.image_url && <PostImage src={m.image_url} alt="Message attachment" className="max-h-48 w-full object-cover" />}
+            <PostImageGallery entity={m} alt="Message attachment" className="max-h-48 w-full object-cover" />
             <p className="mt-1 text-xs text-muted">
               {new Date(m.created_at).toLocaleString()}
             </p>
@@ -90,7 +91,7 @@ export function ThreadView({
           disabled={pending}
         />
         <div className="mt-3">
-          <ImageUploadField label="Attach image (optional)" />
+          <ImageUploadField label="Attach images (optional)" />
         </div>
         {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
         <button type="submit" disabled={pending} className="btn-primary mt-3 text-xs">

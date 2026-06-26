@@ -10,7 +10,7 @@ import {
   canRegisterMeetAndGreet,
 } from "@/lib/membership";
 import { notifyAdminsNewMessage, notifyMembershipApplication, notifyTicketPurchase } from "@/lib/notify";
-import { readImageFromFormData } from "@/lib/images";
+import { readImagesFromFormData, toImageFields } from "@/lib/images";
 import type { MembershipTier } from "@/lib/types";
 
 export type ActionResult = { success: boolean; error?: string };
@@ -160,10 +160,10 @@ export async function createThreadAction(formData: FormData): Promise<ActionResu
   const session = await requireAuth();
   const subject = String(formData.get("subject") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
-  const image = await readImageFromFormData(formData);
-  if (image.error) return { success: false, error: image.error };
+  const images = await readImagesFromFormData(formData);
+  if (images.error) return { success: false, error: images.error };
   if (!subject) return { success: false, error: "Subject is required." };
-  if (!body && !image.data) return { success: false, error: "Message or image is required." };
+  if (!body && images.data.length === 0) return { success: false, error: "Message or image is required." };
 
   const repo = getRepository();
   const threadId = uuidv4();
@@ -173,7 +173,7 @@ export async function createThreadAction(formData: FormData): Promise<ActionResu
     user_id: session.id,
     subject,
     body: body || " ",
-    image_url: image.data,
+    ...toImageFields(images.data),
     sender_role: "fan",
     is_read: false,
     status: "open",
@@ -190,9 +190,9 @@ export async function createThreadAction(formData: FormData): Promise<ActionResu
 export async function replyThreadAction(threadId: string, formData: FormData): Promise<ActionResult> {
   const session = await requireAuth();
   const body = String(formData.get("body") ?? "").trim();
-  const image = await readImageFromFormData(formData);
-  if (image.error) return { success: false, error: image.error };
-  if (!body && !image.data) return { success: false, error: "Message or image is required." };
+  const images = await readImagesFromFormData(formData);
+  if (images.error) return { success: false, error: images.error };
+  if (!body && images.data.length === 0) return { success: false, error: "Message or image is required." };
 
   const repo = getRepository();
   const messages = await repo.getMessagesByThread(threadId);
@@ -206,7 +206,7 @@ export async function replyThreadAction(threadId: string, formData: FormData): P
     user_id: session.id,
     subject: messages[0].subject,
     body: body || " ",
-    image_url: image.data,
+    ...toImageFields(images.data),
     sender_role: "fan",
     is_read: false,
     status: "open",

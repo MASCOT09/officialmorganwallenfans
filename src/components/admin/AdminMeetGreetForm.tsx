@@ -18,7 +18,7 @@ export function AdminMeetGreetForm() {
       <h2 className="font-display text-lg">Create event</h2>
       <input name="title" placeholder="Title" required className="input-field" />
       <textarea name="description" placeholder="Description" required className="input-field" rows={3} />
-      <ImageUploadField label="Event image (optional)" />
+      <ImageUploadField label="Event images (optional)" />
       <input name="location" placeholder="Location" required className="input-field" />
       <input name="event_date" type="datetime-local" required className="input-field" />
       <input name="max_spots" type="number" defaultValue={10} min={1} className="input-field" />

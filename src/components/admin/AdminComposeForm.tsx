@@ -30,7 +30,7 @@ export function AdminComposeForm({ fans }: { fans: AppUserPublic[] }) {
       </label>
       <input name="subject" placeholder="Subject" required className="input-field" />
       <textarea name="body" placeholder="Message" className="input-field" rows={4} />
-      <ImageUploadField label="Attach image (optional)" />
+      <ImageUploadField label="Attach images (optional)" />
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="notify" defaultChecked /> Send notification
       </label>

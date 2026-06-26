@@ -5,7 +5,7 @@ import { getSession } from "@/lib/auth";
 import { canEnterGiveaways } from "@/lib/membership";
 import { enterGiveawayAction } from "@/actions/fan";
 import { MembershipGateButton } from "@/components/MembershipGateButton";
-import { PostImage } from "@/components/PostImage";
+import { PostImageGallery } from "@/components/PostImageGallery";
 import { FormSubmitButton } from "@/components/FormSubmitButton";
 
 async function enterGiveaway(formData: FormData) {
@@ -34,9 +34,7 @@ export default async function GiveawayDetailPage({
         ← Back to giveaways
       </Link>
       <h1 className="mt-6 font-display text-4xl">{giveaway.title}</h1>
-      {giveaway.image_url && (
-        <PostImage src={giveaway.image_url} alt={giveaway.title} className="mt-6 max-h-96 w-full object-cover" />
-      )}
+      <PostImageGallery entity={giveaway} alt={giveaway.title} className="mt-6 max-h-96 w-full object-cover" />
       <p className="mt-4 leading-relaxed text-muted">{giveaway.description}</p>
       {giveaway.ends_at && (
         <p className="mt-4 text-sm text-accent">

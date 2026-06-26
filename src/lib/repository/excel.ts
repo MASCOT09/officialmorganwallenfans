@@ -53,17 +53,17 @@ const HEADERS: Record<SheetName, string[]> = {
     "avatar_url", "membership_tier", "membership_status", "created_at", "last_seen_at",
   ],
   site_settings: ["id", "celebrity_name", "tagline", "hero_video_url", "updated_at"],
-  giveaways: ["id", "title", "description", "image_url", "status", "ends_at", "created_at"],
+  giveaways: ["id", "title", "description", "image_url", "image_urls", "status", "ends_at", "created_at"],
   giveaway_entries: ["id", "giveaway_id", "user_id", "created_at"],
   meet_greet: [
-    "id", "title", "description", "location", "event_date", "max_spots", "status", "image_url", "created_at",
+    "id", "title", "description", "location", "event_date", "max_spots", "status", "image_url", "image_urls", "created_at",
   ],
   meet_greet_registrations: ["id", "event_id", "user_id", "is_waitlist", "created_at"],
   communities: ["id", "name", "description", "platform", "url", "sort_order", "created_at"],
   contact_links: ["id", "recipient", "platform", "url", "label", "created_at"],
   site_buttons: ["id", "label", "url", "sort_order", "created_at"],
   messages: [
-    "id", "thread_id", "user_id", "subject", "body", "image_url", "sender_role", "is_read", "status", "created_at",
+    "id", "thread_id", "user_id", "subject", "body", "image_url", "image_urls", "sender_role", "is_read", "status", "created_at",
   ],
   notifications: ["id", "user_id", "title", "body", "link", "is_read", "created_at"],
   membership_applications: [

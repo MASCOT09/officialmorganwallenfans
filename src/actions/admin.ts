@@ -22,7 +22,7 @@ import type {
   TicketStatus,
   UserRole,
 } from "@/lib/types";
-import { readImageFromFormData } from "@/lib/images";
+import { readImagesFromFormData, toImageFields } from "@/lib/images";
 
 export type ActionResult = { success: boolean; error?: string };
 
@@ -43,13 +43,13 @@ export async function saveGiveawayAction(formData: FormData): Promise<ActionResu
   const repo = getRepository();
   const id = String(formData.get("id") ?? "");
   const notify = formData.get("notify") === "on";
-  const image = await readImageFromFormData(formData);
-  if (image.error) return { success: false, error: image.error };
+  const images = await readImagesFromFormData(formData);
+  if (images.error) return { success: false, error: images.error };
 
   const data = {
     title: String(formData.get("title") ?? ""),
     description: String(formData.get("description") ?? ""),
-    image_url: image.data,
+    ...toImageFields(images.data),
     status: String(formData.get("status") ?? "draft") as GiveawayStatus,
     ends_at: String(formData.get("ends_at") ?? "") || null,
   };
@@ -84,8 +84,8 @@ export async function saveMeetGreetAction(formData: FormData): Promise<ActionRes
   const repo = getRepository();
   const id = String(formData.get("id") ?? "");
   const notify = formData.get("notify") === "on";
-  const image = await readImageFromFormData(formData);
-  if (image.error) return { success: false, error: image.error };
+  const images = await readImagesFromFormData(formData);
+  if (images.error) return { success: false, error: images.error };
 
   const data = {
     title: String(formData.get("title") ?? ""),
@@ -94,7 +94,7 @@ export async function saveMeetGreetAction(formData: FormData): Promise<ActionRes
     event_date: String(formData.get("event_date") ?? ""),
     max_spots: Number(formData.get("max_spots") ?? 10),
     status: String(formData.get("status") ?? "upcoming") as MeetGreetStatus,
-    image_url: image.data,
+    ...toImageFields(images.data),
   };
 
   if (id) {
@@ -442,9 +442,9 @@ export async function deleteFanAction(userId: string): Promise<ActionResult> {
 export async function adminReplyAction(threadId: string, formData: FormData): Promise<ActionResult> {
   await requireAdmin();
   const body = String(formData.get("body") ?? "").trim();
-  const image = await readImageFromFormData(formData);
-  if (image.error) return { success: false, error: image.error };
-  if (!body && !image.data) return { success: false, error: "Message or image is required." };
+  const images = await readImagesFromFormData(formData);
+  if (images.error) return { success: false, error: images.error };
+  if (!body && images.data.length === 0) return { success: false, error: "Message or image is required." };
 
   const repo = getRepository();
   const messages = await repo.getMessagesByThread(threadId);
@@ -457,7 +457,7 @@ export async function adminReplyAction(threadId: string, formData: FormData): Pr
     user_id: fanId,
     subject: messages[0].subject,
     body: body || " ",
-    image_url: image.data,
+    ...toImageFields(images.data),
     sender_role: "admin",
     is_read: false,
     status: "open",
@@ -479,10 +479,10 @@ export async function adminComposeAction(formData: FormData): Promise<ActionResu
   const subject = String(formData.get("subject") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
   const sendNotification = formData.get("notify") === "on";
-  const image = await readImageFromFormData(formData);
-  if (image.error) return { success: false, error: image.error };
+  const images = await readImagesFromFormData(formData);
+  if (images.error) return { success: false, error: images.error };
   if (!subject) return { success: false, error: "Subject is required." };
-  if (!body && !image.data) return { success: false, error: "Message or image is required." };
+  if (!body && images.data.length === 0) return { success: false, error: "Message or image is required." };
 
   const repo = getRepository();
 
@@ -503,7 +503,7 @@ export async function adminComposeAction(formData: FormData): Promise<ActionResu
       user_id: fanId,
       subject,
       body: body || " ",
-      image_url: image.data,
+      ...toImageFields(images.data),
       sender_role: "admin",
       is_read: false,
       status: "open",

@@ -6,7 +6,7 @@ import { canRegisterMeetAndGreet } from "@/lib/membership";
 import { registerMeetGreetAction } from "@/actions/fan";
 import { AuthGateButton } from "@/components/AuthGateButton";
 import { MembershipGateButton } from "@/components/MembershipGateButton";
-import { PostImage } from "@/components/PostImage";
+import { PostImageGallery } from "@/components/PostImageGallery";
 import { FormSubmitButton } from "@/components/FormSubmitButton";
 
 async function registerEvent(formData: FormData) {
@@ -37,9 +37,7 @@ export default async function MeetGreetDetailPage({
         ← Back to events
       </Link>
       <h1 className="mt-6 font-display text-4xl">{event.title}</h1>
-      {event.image_url && (
-        <PostImage src={event.image_url} alt={event.title} className="mt-6 max-h-96 w-full object-cover" />
-      )}
+      <PostImageGallery entity={event} alt={event.title} className="mt-6 max-h-96 w-full object-cover" />
       <p className="mt-4 leading-relaxed text-muted">{event.description}</p>
       <p className="mt-4 text-sm text-accent">
         {event.location} · {new Date(event.event_date).toLocaleString()}

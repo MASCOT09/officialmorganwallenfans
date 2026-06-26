@@ -18,7 +18,7 @@ export function AdminGiveawayForm() {
       <h2 className="font-display text-lg">Create giveaway</h2>
       <input name="title" placeholder="Title" required className="input-field" />
       <textarea name="description" placeholder="Description" required className="input-field" rows={3} />
-      <ImageUploadField label="Giveaway image (optional)" />
+      <ImageUploadField label="Giveaway images (optional)" />
       <input name="ends_at" type="datetime-local" className="input-field" />
       <select name="status" className="input-field">
         <option value="draft">Draft</option>

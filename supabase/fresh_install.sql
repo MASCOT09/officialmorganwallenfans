@@ -52,6 +52,7 @@ CREATE TABLE giveaways (
   title text NOT NULL,
   description text NOT NULL DEFAULT '',
   image_url text,
+  image_urls text[],
   status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'closed')),
   ends_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now()
@@ -82,6 +83,7 @@ CREATE TABLE meet_greet (
   max_spots integer NOT NULL DEFAULT 0,
   status text NOT NULL DEFAULT 'upcoming' CHECK (status IN ('upcoming', 'closed')),
   image_url text,
+  image_urls text[],
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
@@ -137,6 +139,7 @@ CREATE TABLE messages (
   subject text NOT NULL DEFAULT '',
   body text NOT NULL,
   image_url text,
+  image_urls text[],
   is_read boolean NOT NULL DEFAULT false,
   status text NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed')),
   created_at timestamptz NOT NULL DEFAULT now()

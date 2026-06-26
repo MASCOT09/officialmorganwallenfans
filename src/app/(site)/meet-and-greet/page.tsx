@@ -5,7 +5,7 @@ import { canRegisterMeetAndGreet } from "@/lib/membership";
 import { registerMeetGreetAction } from "@/actions/fan";
 import { AuthGateButton } from "@/components/AuthGateButton";
 import { MembershipGateButton } from "@/components/MembershipGateButton";
-import { PostImage } from "@/components/PostImage";
+import { PostImageGallery } from "@/components/PostImageGallery";
 import { FormSubmitButton } from "@/components/FormSubmitButton";
 
 async function registerEvent(formData: FormData) {
@@ -48,7 +48,7 @@ export default async function MeetGreetPage() {
             const spotsLeft = e.max_spots - regs.filter((r) => !r.is_waitlist).length;
             return (
               <div key={e.id} className="glass-card p-6">
-                {e.image_url && <PostImage src={e.image_url} alt={e.title} className="mb-4 max-h-48 w-full object-cover" />}
+                <PostImageGallery entity={e} alt={e.title} className="mb-4 max-h-48 w-full object-cover" />
                 <h2 className="font-display text-xl">{e.title}</h2>
                 <p className="mt-2 text-sm text-muted">{e.description}</p>
                 <p className="mt-2 text-xs text-accent">

@@ -1,7 +1,7 @@
 import { getRepository } from "@/lib/repository";
 import { deleteMeetGreetAction } from "@/actions/admin";
 import { AdminMeetGreetForm } from "@/components/admin/AdminMeetGreetForm";
-import { PostImage } from "@/components/PostImage";
+import { PostImageGallery } from "@/components/PostImageGallery";
 
 export default async function AdminMeetGreetPage() {
   const repo = getRepository();
@@ -22,7 +22,7 @@ export default async function AdminMeetGreetPage() {
                 <p className="text-xs text-muted">
                   {e.location} · {new Date(e.event_date).toLocaleString()} · {e.status}
                 </p>
-                {e.image_url && <PostImage src={e.image_url} alt={e.title} className="mt-3 max-h-40 w-full object-cover" />}
+                <PostImageGallery entity={e} alt={e.title} className="mt-3 max-h-40 w-full object-cover" />
               </div>
               <form action={deleteMeetGreetAction.bind(null, e.id)}>
                 <button type="submit" className="text-xs text-red-400 hover:underline">Delete</button>

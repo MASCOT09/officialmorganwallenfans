@@ -28,7 +28,7 @@ export function MessagesClient({ threads }: { threads: MessageThread[] }) {
         <h2 className="font-display text-lg">Start a new conversation</h2>
         <input name="subject" placeholder="Subject" required className="input-field" />
         <textarea name="body" rows={4} placeholder="Your message..." className="input-field resize-none" />
-        <ImageUploadField label="Attach image (optional)" />
+        <ImageUploadField label="Attach images (optional)" />
         {state.error && <p className="text-sm text-red-400">{state.error}</p>}
         {state.success && <p className="text-sm text-secondary">Message sent!</p>}
         <FormSubmitButton label="Send message" pendingLabel="Sending…" />

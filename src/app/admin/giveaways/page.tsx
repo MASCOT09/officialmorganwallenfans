@@ -1,7 +1,7 @@
 import { getRepository } from "@/lib/repository";
 import { deleteGiveawayAction } from "@/actions/admin";
 import { AdminGiveawayForm } from "@/components/admin/AdminGiveawayForm";
-import { PostImage } from "@/components/PostImage";
+import { PostImageGallery } from "@/components/PostImageGallery";
 
 export default async function AdminGiveawaysPage() {
   const repo = getRepository();
@@ -20,7 +20,7 @@ export default async function AdminGiveawaysPage() {
               <div className="min-w-0 flex-1">
                 <p className="font-medium">{g.title}</p>
                 <p className="text-xs text-muted">{g.status}</p>
-                {g.image_url && <PostImage src={g.image_url} alt={g.title} className="mt-3 max-h-40 w-full object-cover" />}
+                <PostImageGallery entity={g} alt={g.title} className="mt-3 max-h-40 w-full object-cover" />
               </div>
               <form action={deleteGiveawayAction.bind(null, g.id)}>
                 <button type="submit" className="text-xs text-red-400 hover:underline">Delete</button>

@@ -54,6 +54,7 @@ export interface Giveaway {
   title: string;
   description: string;
   image_url: string | null;
+  image_urls: string[] | null;
   status: GiveawayStatus;
   ends_at: string | null;
   created_at: string;
@@ -75,6 +76,7 @@ export interface MeetGreet {
   max_spots: number;
   status: MeetGreetStatus;
   image_url: string | null;
+  image_urls: string[] | null;
   created_at: string;
 }
 
@@ -148,6 +150,7 @@ export interface Message {
   subject: string;
   body: string;
   image_url: string | null;
+  image_urls: string[] | null;
   sender_role: MessageSenderRole;
   is_read: boolean;
   status: MessageStatus;

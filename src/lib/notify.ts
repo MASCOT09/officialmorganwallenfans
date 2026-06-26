@@ -169,6 +169,7 @@ export async function broadcastToFans(
       subject,
       body,
       image_url: null,
+      image_urls: null,
       sender_role: "admin",
       is_read: false,
       status: "open",
