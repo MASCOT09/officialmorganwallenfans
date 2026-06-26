@@ -1,11 +1,13 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { replyThreadAction } from "@/actions/fan";
 import { adminReplyAction } from "@/actions/admin";
 import type { Message } from "@/lib/types";
 import { formatLastSeen } from "@/lib/membership";
+import { ImageUploadField } from "@/components/ImageUploadField";
+import { PostImage } from "@/components/PostImage";
 
 interface ThreadViewProps {
   threadId: string;
@@ -23,6 +25,7 @@ export function ThreadView({
   fanName,
 }: ThreadViewProps) {
   const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -30,11 +33,18 @@ export function ThreadView({
     const form = e.currentTarget;
     const formData = new FormData(form);
     const body = String(formData.get("body") ?? "").trim();
-    if (!body || pending) return;
+    const image = formData.get("image");
+    const hasImage = image instanceof File && image.size > 0;
+    if ((!body && !hasImage) || pending) return;
 
+    setError(null);
     startTransition(async () => {
       const action = isAdmin ? adminReplyAction : replyThreadAction;
-      await action(threadId, formData);
+      const result = await action(threadId, formData);
+      if (result && "success" in result && !result.success) {
+        setError(result.error ?? "Failed to send message.");
+        return;
+      }
       form.reset();
       router.refresh();
     });
@@ -63,22 +73,26 @@ export function ThreadView({
             key={m.id}
             className={m.sender_role === "fan" ? "chat-bubble-fan" : "chat-bubble-admin"}
           >
-            <p>{m.body}</p>
+            {m.body.trim() && <p>{m.body}</p>}
+            {m.image_url && <PostImage src={m.image_url} alt="Message attachment" className="max-h-48 w-full object-cover" />}
             <p className="mt-1 text-xs text-muted">
               {new Date(m.created_at).toLocaleString()}
             </p>
           </div>
         ))}
       </div>
-      <form onSubmit={handleSubmit} className="border-t border-card-border p-4">
+      <form onSubmit={handleSubmit} encType="multipart/form-data" className="border-t border-card-border p-4">
         <textarea
           name="body"
           rows={3}
           placeholder="Type your reply..."
           className="input-field resize-none"
-          required
           disabled={pending}
         />
+        <div className="mt-3">
+          <ImageUploadField label="Attach image (optional)" />
+        </div>
+        {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
         <button type="submit" disabled={pending} className="btn-primary mt-3 text-xs">
           {pending ? "Sending…" : "Send reply"}
         </button>

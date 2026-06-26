@@ -84,6 +84,7 @@ export async function signupAction(formData: FormData): Promise<ActionResult> {
     user_id: userId,
     subject: `Welcome to the ${TEAM_NAME}!`,
     body: `Hey ${displayName}! Welcome to the official Morgan Wallen fan community. We're glad you're here. Check out giveaways, events, and membership perks from your dashboard.`,
+    image_url: null,
     sender_role: "admin",
     is_read: false,
     status: "open",

@@ -10,6 +10,7 @@ import {
   canRegisterMeetAndGreet,
 } from "@/lib/membership";
 import { notifyAdminsNewMessage, notifyMembershipApplication, notifyTicketPurchase } from "@/lib/notify";
+import { readImageFromFormData } from "@/lib/images";
 import type { MembershipTier } from "@/lib/types";
 
 export type ActionResult = { success: boolean; error?: string };
@@ -159,8 +160,10 @@ export async function createThreadAction(formData: FormData): Promise<ActionResu
   const session = await requireAuth();
   const subject = String(formData.get("subject") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
-
-  if (!subject || !body) return { success: false, error: "Subject and message are required." };
+  const image = await readImageFromFormData(formData);
+  if (image.error) return { success: false, error: image.error };
+  if (!subject) return { success: false, error: "Subject is required." };
+  if (!body && !image.data) return { success: false, error: "Message or image is required." };
 
   const repo = getRepository();
   const threadId = uuidv4();
@@ -169,7 +172,8 @@ export async function createThreadAction(formData: FormData): Promise<ActionResu
     thread_id: threadId,
     user_id: session.id,
     subject,
-    body,
+    body: body || " ",
+    image_url: image.data,
     sender_role: "fan",
     is_read: false,
     status: "open",
@@ -186,7 +190,9 @@ export async function createThreadAction(formData: FormData): Promise<ActionResu
 export async function replyThreadAction(threadId: string, formData: FormData): Promise<ActionResult> {
   const session = await requireAuth();
   const body = String(formData.get("body") ?? "").trim();
-  if (!body) return { success: false, error: "Message cannot be empty." };
+  const image = await readImageFromFormData(formData);
+  if (image.error) return { success: false, error: image.error };
+  if (!body && !image.data) return { success: false, error: "Message or image is required." };
 
   const repo = getRepository();
   const messages = await repo.getMessagesByThread(threadId);
@@ -199,7 +205,8 @@ export async function replyThreadAction(threadId: string, formData: FormData): P
     thread_id: threadId,
     user_id: session.id,
     subject: messages[0].subject,
-    body,
+    body: body || " ",
+    image_url: image.data,
     sender_role: "fan",
     is_read: false,
     status: "open",

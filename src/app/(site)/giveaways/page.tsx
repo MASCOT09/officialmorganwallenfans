@@ -4,6 +4,8 @@ import { getSession } from "@/lib/auth";
 import { canEnterGiveaways } from "@/lib/membership";
 import { enterGiveawayAction } from "@/actions/fan";
 import { MembershipGateButton } from "@/components/MembershipGateButton";
+import { PostImage } from "@/components/PostImage";
+import { FormSubmitButton } from "@/components/FormSubmitButton";
 
 async function enterGiveaway(formData: FormData) {
   "use server";
@@ -30,6 +32,7 @@ export default async function GiveawaysPage() {
         <div className="mt-10 grid gap-6">
           {giveaways.map((g) => (
             <div key={g.id} className="glass-card p-6">
+              {g.image_url && <PostImage src={g.image_url} alt={g.title} className="mb-4 max-h-48 w-full object-cover" />}
               <h2 className="font-display text-xl">{g.title}</h2>
               <p className="mt-2 text-sm text-muted">{g.description}</p>
               {g.ends_at && (
@@ -50,9 +53,7 @@ export default async function GiveawaysPage() {
                 >
                   <form action={enterGiveaway}>
                     <input type="hidden" name="giveawayId" value={g.id} />
-                    <button type="submit" className="btn-primary text-xs">
-                      Enter giveaway
-                    </button>
+                    <FormSubmitButton label="Enter giveaway" pendingLabel="Entering…" />
                   </form>
                 </MembershipGateButton>
               </div>

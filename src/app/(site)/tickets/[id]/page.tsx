@@ -5,6 +5,7 @@ import { getSession } from "@/lib/auth";
 import { formatPrice } from "@/lib/membership";
 import { purchaseTicketAction } from "@/actions/fan";
 import { AuthGateButton } from "@/components/AuthGateButton";
+import { FormSubmitButton } from "@/components/FormSubmitButton";
 
 async function purchaseTicket(formData: FormData) {
   "use server";
@@ -67,9 +68,7 @@ export default async function TicketDetailPage({
                   )}
                 </select>
               </div>
-              <button type="submit" className="btn-primary">
-                Purchase tickets
-              </button>
+              <FormSubmitButton label="Purchase tickets" pendingLabel="Purchasing…" className="btn-primary" />
             </form>
           </AuthGateButton>
         </div>

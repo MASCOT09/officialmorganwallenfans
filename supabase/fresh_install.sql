@@ -81,6 +81,7 @@ CREATE TABLE meet_greet (
   event_date timestamptz NOT NULL,
   max_spots integer NOT NULL DEFAULT 0,
   status text NOT NULL DEFAULT 'upcoming' CHECK (status IN ('upcoming', 'closed')),
+  image_url text,
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
@@ -135,6 +136,7 @@ CREATE TABLE messages (
   sender_role text NOT NULL CHECK (sender_role IN ('fan', 'admin')),
   subject text NOT NULL DEFAULT '',
   body text NOT NULL,
+  image_url text,
   is_read boolean NOT NULL DEFAULT false,
   status text NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed')),
   created_at timestamptz NOT NULL DEFAULT now()

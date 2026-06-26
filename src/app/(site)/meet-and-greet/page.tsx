@@ -5,6 +5,8 @@ import { canRegisterMeetAndGreet } from "@/lib/membership";
 import { registerMeetGreetAction } from "@/actions/fan";
 import { AuthGateButton } from "@/components/AuthGateButton";
 import { MembershipGateButton } from "@/components/MembershipGateButton";
+import { PostImage } from "@/components/PostImage";
+import { FormSubmitButton } from "@/components/FormSubmitButton";
 
 async function registerEvent(formData: FormData) {
   "use server";
@@ -46,6 +48,7 @@ export default async function MeetGreetPage() {
             const spotsLeft = e.max_spots - regs.filter((r) => !r.is_waitlist).length;
             return (
               <div key={e.id} className="glass-card p-6">
+                {e.image_url && <PostImage src={e.image_url} alt={e.title} className="mb-4 max-h-48 w-full object-cover" />}
                 <h2 className="font-display text-xl">{e.title}</h2>
                 <p className="mt-2 text-sm text-muted">{e.description}</p>
                 <p className="mt-2 text-xs text-accent">
@@ -72,9 +75,7 @@ export default async function MeetGreetPage() {
                     >
                       <form action={registerEvent}>
                         <input type="hidden" name="eventId" value={e.id} />
-                        <button type="submit" className="btn-primary text-xs">
-                          Register
-                        </button>
+                        <FormSubmitButton label="Register" pendingLabel="Registering…" />
                       </form>
                     </MembershipGateButton>
                   </AuthGateButton>

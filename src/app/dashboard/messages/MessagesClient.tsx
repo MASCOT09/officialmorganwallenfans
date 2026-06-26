@@ -5,10 +5,12 @@ import Link from "next/link";
 import { MessageSquare } from "lucide-react";
 import { createThreadAction } from "@/actions/fan";
 import { EmptyState } from "@/components/EmptyState";
+import { ImageUploadField } from "@/components/ImageUploadField";
+import { FormSubmitButton } from "@/components/FormSubmitButton";
 import type { MessageThread } from "@/lib/types";
 
 export function MessagesClient({ threads }: { threads: MessageThread[] }) {
-  const [state, action, pending] = useActionState(
+  const [state, action] = useActionState(
     async (_prev: { success: boolean; error?: string }, formData: FormData) => {
       return createThreadAction(formData);
     },
@@ -22,15 +24,14 @@ export function MessagesClient({ threads }: { threads: MessageThread[] }) {
         <p className="text-muted">Chat with the Morgan Wallen Fan Team.</p>
       </div>
 
-      <form action={action} className="glass-card space-y-4 p-6">
+      <form action={action} encType="multipart/form-data" className="glass-card space-y-4 p-6">
         <h2 className="font-display text-lg">Start a new conversation</h2>
         <input name="subject" placeholder="Subject" required className="input-field" />
-        <textarea name="body" rows={4} placeholder="Your message..." required className="input-field resize-none" />
+        <textarea name="body" rows={4} placeholder="Your message..." className="input-field resize-none" />
+        <ImageUploadField label="Attach image (optional)" />
         {state.error && <p className="text-sm text-red-400">{state.error}</p>}
         {state.success && <p className="text-sm text-secondary">Message sent!</p>}
-        <button type="submit" disabled={pending} className="btn-primary text-xs">
-          {pending ? "Sending…" : "Send message"}
-        </button>
+        <FormSubmitButton label="Send message" pendingLabel="Sending…" />
       </form>
 
       {threads.length === 0 ? (

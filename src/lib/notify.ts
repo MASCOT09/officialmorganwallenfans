@@ -168,6 +168,7 @@ export async function broadcastToFans(
       user_id: fanId,
       subject,
       body,
+      image_url: null,
       sender_role: "admin",
       is_read: false,
       status: "open",

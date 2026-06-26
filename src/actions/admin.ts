@@ -22,6 +22,7 @@ import type {
   TicketStatus,
   UserRole,
 } from "@/lib/types";
+import { readImageFromFormData } from "@/lib/images";
 
 export type ActionResult = { success: boolean; error?: string };
 
@@ -37,15 +38,18 @@ export async function saveSiteSettingsAction(formData: FormData): Promise<void> 
   revalidatePath("/admin/settings");
 }
 
-export async function saveGiveawayAction(formData: FormData): Promise<void> {
+export async function saveGiveawayAction(formData: FormData): Promise<ActionResult> {
   await requireAdmin();
   const repo = getRepository();
   const id = String(formData.get("id") ?? "");
   const notify = formData.get("notify") === "on";
+  const image = await readImageFromFormData(formData);
+  if (image.error) return { success: false, error: image.error };
+
   const data = {
     title: String(formData.get("title") ?? ""),
     description: String(formData.get("description") ?? ""),
-    image_url: String(formData.get("image_url") ?? "") || null,
+    image_url: image.data,
     status: String(formData.get("status") ?? "draft") as GiveawayStatus,
     ends_at: String(formData.get("ends_at") ?? "") || null,
   };
@@ -65,6 +69,7 @@ export async function saveGiveawayAction(formData: FormData): Promise<void> {
 
   revalidatePath("/admin/giveaways");
   revalidatePath("/giveaways");
+  return { success: true };
 }
 
 export async function deleteGiveawayAction(id: string): Promise<void> {
@@ -74,11 +79,14 @@ export async function deleteGiveawayAction(id: string): Promise<void> {
   revalidatePath("/admin/giveaways");
 }
 
-export async function saveMeetGreetAction(formData: FormData): Promise<void> {
+export async function saveMeetGreetAction(formData: FormData): Promise<ActionResult> {
   await requireAdmin();
   const repo = getRepository();
   const id = String(formData.get("id") ?? "");
   const notify = formData.get("notify") === "on";
+  const image = await readImageFromFormData(formData);
+  if (image.error) return { success: false, error: image.error };
+
   const data = {
     title: String(formData.get("title") ?? ""),
     description: String(formData.get("description") ?? ""),
@@ -86,6 +94,7 @@ export async function saveMeetGreetAction(formData: FormData): Promise<void> {
     event_date: String(formData.get("event_date") ?? ""),
     max_spots: Number(formData.get("max_spots") ?? 10),
     status: String(formData.get("status") ?? "upcoming") as MeetGreetStatus,
+    image_url: image.data,
   };
 
   if (id) {
@@ -103,6 +112,7 @@ export async function saveMeetGreetAction(formData: FormData): Promise<void> {
 
   revalidatePath("/admin/meet-greet");
   revalidatePath("/meet-and-greet");
+  return { success: true };
 }
 
 export async function deleteMeetGreetAction(id: string): Promise<void> {
@@ -429,14 +439,16 @@ export async function deleteFanAction(userId: string): Promise<ActionResult> {
   return { success: true };
 }
 
-export async function adminReplyAction(threadId: string, formData: FormData): Promise<void> {
+export async function adminReplyAction(threadId: string, formData: FormData): Promise<ActionResult> {
   await requireAdmin();
   const body = String(formData.get("body") ?? "").trim();
-  if (!body) return;
+  const image = await readImageFromFormData(formData);
+  if (image.error) return { success: false, error: image.error };
+  if (!body && !image.data) return { success: false, error: "Message or image is required." };
 
   const repo = getRepository();
   const messages = await repo.getMessagesByThread(threadId);
-  if (messages.length === 0) return;
+  if (messages.length === 0) return { success: false, error: "Thread not found." };
 
   const fanId = messages[0].user_id;
   await repo.createMessage({
@@ -444,7 +456,8 @@ export async function adminReplyAction(threadId: string, formData: FormData): Pr
     thread_id: threadId,
     user_id: fanId,
     subject: messages[0].subject,
-    body,
+    body: body || " ",
+    image_url: image.data,
     sender_role: "admin",
     is_read: false,
     status: "open",
@@ -456,17 +469,20 @@ export async function adminReplyAction(threadId: string, formData: FormData): Pr
   }
 
   revalidatePath(`/admin/messages/${threadId}`);
+  return { success: true };
 }
 
-export async function adminComposeAction(formData: FormData): Promise<void> {
+export async function adminComposeAction(formData: FormData): Promise<ActionResult> {
   await requireAdmin();
   const fanId = String(formData.get("fan_id") ?? "");
   const broadcast = formData.get("broadcast") === "on";
   const subject = String(formData.get("subject") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
   const sendNotification = formData.get("notify") === "on";
-
-  if (!subject || !body) return;
+  const image = await readImageFromFormData(formData);
+  if (image.error) return { success: false, error: image.error };
+  if (!subject) return { success: false, error: "Subject is required." };
+  if (!body && !image.data) return { success: false, error: "Message or image is required." };
 
   const repo = getRepository();
 
@@ -479,14 +495,15 @@ export async function adminComposeAction(formData: FormData): Promise<void> {
       sendNotification,
     );
   } else {
-    if (!fanId) return;
+    if (!fanId) return { success: false, error: "Select a fan or enable broadcast." };
     const threadId = uuidv4();
     await repo.createMessage({
       id: uuidv4(),
       thread_id: threadId,
       user_id: fanId,
       subject,
-      body,
+      body: body || " ",
+      image_url: image.data,
       sender_role: "admin",
       is_read: false,
       status: "open",
@@ -498,6 +515,7 @@ export async function adminComposeAction(formData: FormData): Promise<void> {
   }
 
   revalidatePath("/admin/messages");
+  return { success: true };
 }
 
 export async function markThreadReadAdminAction(threadId: string) {

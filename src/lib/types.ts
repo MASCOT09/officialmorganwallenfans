@@ -74,6 +74,7 @@ export interface MeetGreet {
   event_date: string;
   max_spots: number;
   status: MeetGreetStatus;
+  image_url: string | null;
   created_at: string;
 }
 
@@ -146,6 +147,7 @@ export interface Message {
   user_id: string;
   subject: string;
   body: string;
+  image_url: string | null;
   sender_role: MessageSenderRole;
   is_read: boolean;
   status: MessageStatus;
