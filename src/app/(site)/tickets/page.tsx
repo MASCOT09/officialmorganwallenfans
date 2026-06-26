@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { getRepository } from "@/lib/repository";
 import { getSession } from "@/lib/auth";
-import { canPurchaseTickets, formatPrice } from "@/lib/membership";
+import { formatPrice } from "@/lib/membership";
 import { purchaseTicketAction } from "@/actions/fan";
-import { MembershipGateButton } from "@/components/MembershipGateButton";
+import { AuthGateButton } from "@/components/AuthGateButton";
 
 async function purchaseTicket(formData: FormData) {
   "use server";
@@ -18,7 +18,6 @@ export default async function TicketsPage() {
   const repo = getRepository();
   const session = await getSession();
   const tickets = await repo.getTickets("active");
-  const canPurchase = canPurchaseTickets(session);
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-16">
@@ -44,10 +43,8 @@ export default async function TicketsPage() {
                   Details
                 </Link>
                 {t.quantity_available > 0 && (
-                  <MembershipGateButton
+                  <AuthGateButton
                     actionLabel="Purchase"
-                    requiredTier="silver"
-                    canParticipate={canPurchase}
                     isLoggedIn={!!session}
                     redirectPath="/tickets"
                   >
@@ -64,7 +61,7 @@ export default async function TicketsPage() {
                         Purchase
                       </button>
                     </form>
-                  </MembershipGateButton>
+                  </AuthGateButton>
                 )}
               </div>
             </div>

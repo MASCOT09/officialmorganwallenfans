@@ -8,7 +8,6 @@ import { getRepository } from "@/lib/repository";
 import {
   canEnterGiveaways,
   canRegisterMeetAndGreet,
-  canPurchaseTickets,
 } from "@/lib/membership";
 import { notifyAdminsNewMessage, notifyMembershipApplication, notifyTicketPurchase } from "@/lib/notify";
 import type { MembershipTier } from "@/lib/types";
@@ -107,10 +106,6 @@ export async function purchaseTicketAction(
   quantity: number,
 ): Promise<ActionResult> {
   const session = await requireAuth();
-  if (!canPurchaseTickets(session)) {
-    return { success: false, error: "Silver membership required to purchase tickets." };
-  }
-
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10) {
     return { success: false, error: "Quantity must be between 1 and 10." };
   }

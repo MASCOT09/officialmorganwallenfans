@@ -10,7 +10,8 @@
     "lint": "next lint",
     "seed": "node scripts/seed-excel.mjs",
     "generate-vapid": "node scripts/generate-vapid-keys.mjs",
-    "setup:supabase": "node scripts/setup-supabase-production.mjs"
+    "setup:supabase": "node scripts/setup-supabase-production.mjs",
+    "bootstrap:supabase": "node scripts/bootstrap-new-supabase.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.0.0",

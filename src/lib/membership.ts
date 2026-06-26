@@ -1,7 +1,7 @@
 import type { MembershipTier, SessionUser } from "./types";
 
 export const MEMBERSHIP_TIERS = {
-  none: { label: "None", price: 0, perks: ["Browse only"] },
+  none: { label: "None", price: 0, perks: ["Browse only", "Ticket purchase with account"] },
   silver: {
     label: "Silver",
     price: 100,
@@ -10,7 +10,6 @@ export const MEMBERSHIP_TIERS = {
       "Team messages",
       "Manager contact",
       "Push notifications",
-      "Concert ticket purchase",
     ],
   },
   gold: {
@@ -51,7 +50,7 @@ export function canEnterGiveaways(user: SessionUser | null): boolean {
 }
 
 export function canPurchaseTickets(user: SessionUser | null): boolean {
-  return hasActiveMembership(user) && tierRank(user!.membership_tier) >= tierRank("silver");
+  return !!user;
 }
 
 export function formatPrice(cents: number): string {
