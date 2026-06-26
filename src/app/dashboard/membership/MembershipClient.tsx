@@ -66,7 +66,7 @@ export function MembershipClient({
       <div>
         <h1 className="font-display text-3xl">Membership</h1>
         <p className="text-muted">
-          Apply for membership — payment is handled offline by the Morgan Wallen Fan Team.
+          Apply for membership — after you apply, you&apos;ll be taken to the team inbox to choose how to pay (PayPal, Apple Gift Card, or Bitcoin).
         </p>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

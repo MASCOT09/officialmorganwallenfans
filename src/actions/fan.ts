@@ -2,6 +2,7 @@
 
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import { requireAuth } from "@/lib/auth";
 import { getRepository } from "@/lib/repository";
@@ -11,6 +12,13 @@ import {
 } from "@/lib/membership";
 import { notifyAdminsNewMessage, notifyMembershipApplication, notifyTicketPurchase } from "@/lib/notify";
 import { readImagesFromFormData, toImageFields } from "@/lib/images";
+import {
+  completePaymentMethodSelection,
+  membershipAmountCents,
+  membershipPlanLabel,
+  startPaymentInbox,
+  type PaymentMethod,
+} from "@/lib/payment-inbox";
 import type { MembershipTier } from "@/lib/types";
 
 export type ActionResult = { success: boolean; error?: string };
@@ -39,8 +47,16 @@ export async function applyMembershipAction(tier: MembershipTier): Promise<Actio
     await notifyMembershipApplication(session.display_name, tier);
   });
 
+  const threadId = await startPaymentInbox(session.id, {
+    type: "membership",
+    tier,
+    planLabel: membershipPlanLabel(tier),
+    amountCents: membershipAmountCents(tier),
+  });
+
   revalidatePath("/dashboard/membership");
-  return { success: true };
+  revalidatePath("/dashboard/messages");
+  redirect(`/dashboard/messages/${threadId}`);
 }
 
 export async function enterGiveawayAction(giveawayId: string): Promise<ActionResult> {
@@ -122,8 +138,9 @@ export async function purchaseTicketAction(
   }
 
   const totalCents = ticket.price_cents * quantity;
+  const orderId = uuidv4();
   await repo.createTicketOrder({
-    id: uuidv4(),
+    id: orderId,
     ticket_id: ticketId,
     user_id: session.id,
     quantity,
@@ -147,13 +164,33 @@ export async function purchaseTicketAction(
     );
   });
 
+  const threadId = await startPaymentInbox(session.id, {
+    type: "ticket",
+    ticketTitle: ticket.title,
+    quantity,
+    amountCents: totalCents,
+    orderId,
+  });
+
   revalidatePath("/tickets");
   revalidatePath(`/tickets/${ticketId}`);
   revalidatePath("/dashboard/tickets");
-  return {
-    success: true,
-    error: "Order placed! The fan team will confirm your purchase and send payment details.",
-  };
+  revalidatePath("/dashboard/messages");
+  redirect(`/dashboard/messages/${threadId}`);
+}
+
+export async function selectPaymentMethodAction(
+  threadId: string,
+  method: PaymentMethod,
+): Promise<ActionResult> {
+  const session = await requireAuth();
+  const result = await completePaymentMethodSelection(session.id, threadId, method);
+  if (!result.success) return result;
+
+  revalidatePath(`/dashboard/messages/${threadId}`);
+  revalidatePath("/admin/messages");
+  revalidatePath(`/admin/messages/${threadId}`);
+  return { success: true };
 }
 
 export async function createThreadAction(formData: FormData): Promise<ActionResult> {

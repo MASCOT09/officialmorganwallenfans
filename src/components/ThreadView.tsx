@@ -6,8 +6,10 @@ import { replyThreadAction } from "@/actions/fan";
 import { adminReplyAction } from "@/actions/admin";
 import type { Message } from "@/lib/types";
 import { formatLastSeen } from "@/lib/membership";
+import { getActivePaymentOptions, visibleMessageBody } from "@/lib/payment-inbox-shared";
 import { ImageUploadField } from "@/components/ImageUploadField";
 import { PostImageGallery } from "@/components/PostImageGallery";
+import { PaymentOptionsButtons } from "@/components/PaymentOptionsButtons";
 
 interface ThreadViewProps {
   threadId: string;
@@ -27,6 +29,7 @@ export function ThreadView({
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const activePaymentOptions = !isAdmin ? getActivePaymentOptions(messages) : null;
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -69,18 +72,27 @@ export function ThreadView({
         </div>
       )}
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
-        {messages.map((m) => (
-          <div
-            key={m.id}
-            className={m.sender_role === "fan" ? "chat-bubble-fan" : "chat-bubble-admin"}
-          >
-            {m.body.trim() && <p>{m.body}</p>}
-            <PostImageGallery entity={m} alt="Message attachment" className="max-h-48 w-full object-cover" />
-            <p className="mt-1 text-xs text-muted">
-              {new Date(m.created_at).toLocaleString()}
-            </p>
+        {messages.map((m) => {
+          const text = visibleMessageBody(m.body);
+          return (
+            <div
+              key={m.id}
+              className={m.sender_role === "fan" ? "chat-bubble-fan" : "chat-bubble-admin"}
+            >
+              {text && <p className="whitespace-pre-wrap">{text}</p>}
+              <PostImageGallery entity={m} alt="Message attachment" className="max-h-48 w-full object-cover" />
+              <p className="mt-1 text-xs text-muted">
+                {new Date(m.created_at).toLocaleString()}
+              </p>
+            </div>
+          );
+        })}
+        {activePaymentOptions && (
+          <div className="rounded-xl border border-accent/30 bg-accent/5 p-4">
+            <p className="text-sm text-muted">Choose your payment method:</p>
+            <PaymentOptionsButtons threadId={threadId} />
           </div>
-        ))}
+        )}
       </div>
       <form onSubmit={handleSubmit} encType="multipart/form-data" className="border-t border-card-border p-4">
         <textarea
