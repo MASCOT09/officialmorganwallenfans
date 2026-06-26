@@ -5,7 +5,7 @@ interface AuthGateButtonProps {
   redirectPath: string;
   actionLabel: string;
   className?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export function AuthGateButton({

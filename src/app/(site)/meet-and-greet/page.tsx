@@ -3,6 +3,7 @@ import { getRepository } from "@/lib/repository";
 import { getSession } from "@/lib/auth";
 import { canRegisterMeetAndGreet } from "@/lib/membership";
 import { registerMeetGreetAction } from "@/actions/fan";
+import { AuthGateButton } from "@/components/AuthGateButton";
 import { MembershipGateButton } from "@/components/MembershipGateButton";
 
 async function registerEvent(formData: FormData) {
@@ -25,7 +26,19 @@ export default async function MeetGreetPage() {
       <p className="mt-2 text-muted">Browse exclusive Morgan Wallen fan experiences.</p>
 
       {events.length === 0 ? (
-        <p className="mt-12 text-muted">No upcoming events. Check back soon!</p>
+        <div className="mt-12">
+          <p className="text-muted">No upcoming events. Check back soon!</p>
+          {!session && (
+            <AuthGateButton
+              isLoggedIn={false}
+              redirectPath="/meet-and-greet"
+              actionLabel="Sign up or log in"
+              className="btn-primary mt-6"
+            >
+              <></>
+            </AuthGateButton>
+          )}
+        </div>
       ) : (
         <div className="mt-10 grid gap-6">
           {events.map(async (e) => {
@@ -45,20 +58,26 @@ export default async function MeetGreetPage() {
                   <Link href={`/meet-and-greet/${e.id}`} className="btn-secondary text-xs">
                     Details
                   </Link>
-                  <MembershipGateButton
-                    actionLabel="Register"
-                    requiredTier="gold"
-                    canParticipate={canRegister}
+                  <AuthGateButton
                     isLoggedIn={!!session}
                     redirectPath="/meet-and-greet"
+                    actionLabel="Register"
                   >
-                    <form action={registerEvent}>
-                      <input type="hidden" name="eventId" value={e.id} />
-                      <button type="submit" className="btn-primary text-xs">
-                        Register
-                      </button>
-                    </form>
-                  </MembershipGateButton>
+                    <MembershipGateButton
+                      actionLabel="Register"
+                      requiredTier="gold"
+                      canParticipate={canRegister}
+                      isLoggedIn
+                      redirectPath="/meet-and-greet"
+                    >
+                      <form action={registerEvent}>
+                        <input type="hidden" name="eventId" value={e.id} />
+                        <button type="submit" className="btn-primary text-xs">
+                          Register
+                        </button>
+                      </form>
+                    </MembershipGateButton>
+                  </AuthGateButton>
                 </div>
               </div>
             );

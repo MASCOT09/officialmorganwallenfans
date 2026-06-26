@@ -4,6 +4,7 @@ import { getRepository } from "@/lib/repository";
 import { getSession } from "@/lib/auth";
 import { canRegisterMeetAndGreet } from "@/lib/membership";
 import { registerMeetGreetAction } from "@/actions/fan";
+import { AuthGateButton } from "@/components/AuthGateButton";
 import { MembershipGateButton } from "@/components/MembershipGateButton";
 
 async function registerEvent(formData: FormData) {
@@ -45,21 +46,28 @@ export default async function MeetGreetDetailPage({
         <p className="mt-8 text-secondary">You&apos;re registered!</p>
       ) : (
         <div className="mt-8">
-          <MembershipGateButton
-            actionLabel="Register for this event"
-            requiredTier="gold"
-            canParticipate={canRegister}
+          <AuthGateButton
             isLoggedIn={!!session}
             redirectPath={`/meet-and-greet/${id}`}
+            actionLabel="Register for this event"
             className="btn-primary"
           >
-            <form action={registerEvent}>
-              <input type="hidden" name="eventId" value={id} />
-              <button type="submit" className="btn-primary">
-                Register for this event
-              </button>
-            </form>
-          </MembershipGateButton>
+            <MembershipGateButton
+              actionLabel="Register for this event"
+              requiredTier="gold"
+              canParticipate={canRegister}
+              isLoggedIn
+              redirectPath={`/meet-and-greet/${id}`}
+              className="btn-primary"
+            >
+              <form action={registerEvent}>
+                <input type="hidden" name="eventId" value={id} />
+                <button type="submit" className="btn-primary">
+                  Register for this event
+                </button>
+              </form>
+            </MembershipGateButton>
+          </AuthGateButton>
         </div>
       )}
     </div>
