@@ -109,7 +109,7 @@ export async function sendNewMessageAlert(
     `New message from the ${TEAM_NAME}`,
     layout(`
       <h1 style="color:#F0F3EC;">Hi ${name},</h1>
-      <p>The ${TEAM_NAME} sent you a new message. Log in to read and reply.</p>
+      <p>The ${TEAM_NAME} sent you a new message. Log in to read and reply in your inbox.</p>
       <p><a href="${link}" style="color:#7A9A6E;">Open conversation →</a></p>
     `),
   );

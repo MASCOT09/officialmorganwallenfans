@@ -485,6 +485,7 @@ export async function adminComposeAction(formData: FormData): Promise<ActionResu
   if (!body && images.data.length === 0) return { success: false, error: "Message or image is required." };
 
   const repo = getRepository();
+  let newThreadId: string | undefined;
 
   if (broadcast) {
     const fans = await repo.getAllFans();
@@ -496,10 +497,10 @@ export async function adminComposeAction(formData: FormData): Promise<ActionResu
     );
   } else {
     if (!fanId) return { success: false, error: "Select a fan or enable broadcast." };
-    const threadId = uuidv4();
+    newThreadId = uuidv4();
     await repo.createMessage({
       id: uuidv4(),
-      thread_id: threadId,
+      thread_id: newThreadId,
       user_id: fanId,
       subject,
       body: body || " ",
@@ -508,13 +509,12 @@ export async function adminComposeAction(formData: FormData): Promise<ActionResu
       is_read: false,
       status: "open",
     });
-    if (sendNotification) {
-      const fan = await repo.getUserById(fanId);
-      if (fan) await notifyFanNewMessage(fanId, fan.email, fan.display_name, threadId);
-    }
+    const fan = await repo.getUserById(fanId);
+    if (fan) await notifyFanNewMessage(fanId, fan.email, fan.display_name, newThreadId);
   }
 
   revalidatePath("/admin/messages");
+  if (newThreadId) revalidatePath(`/admin/messages/${newThreadId}`);
   return { success: true };
 }
 

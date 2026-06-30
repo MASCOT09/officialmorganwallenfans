@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { requireAdmin } from "@/lib/auth";
 import { getRepository } from "@/lib/repository";
-import { markThreadReadAdminAction } from "@/actions/admin";
 import { ThreadView } from "@/components/ThreadView";
 
 export default async function AdminThreadPage({
@@ -8,13 +8,14 @@ export default async function AdminThreadPage({
 }: {
   params: Promise<{ threadId: string }>;
 }) {
+  await requireAdmin();
   const { threadId } = await params;
   const repo = getRepository();
   const messages = await repo.getMessagesByThread(threadId);
   if (messages.length === 0) return <p>Thread not found.</p>;
 
   const fan = await repo.getUserById(messages[0].user_id);
-  await markThreadReadAdminAction(threadId);
+  await repo.markThreadRead(threadId, "admin");
 
   return (
     <div className="flex h-[calc(100vh-8rem)] flex-col">
