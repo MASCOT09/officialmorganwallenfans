@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { requireAuth } from "@/lib/auth";
 import { getRepository } from "@/lib/repository";
 import { ThreadView } from "@/components/ThreadView";
+import { ThreadPageFrame } from "@/components/portal/ThreadPageFrame";
 
 export default async function ThreadPage({
   params,
@@ -20,19 +20,17 @@ export default async function ThreadPage({
   await repo.markThreadRead(threadId, "fan");
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] flex-col">
-      <Link href="/dashboard/messages" className="mb-4 text-sm text-accent hover:underline">
-        ← Back to messages
-      </Link>
-      <h1 className="font-display text-xl">{messages[0].subject}</h1>
-      <div className="mt-4 flex-1 overflow-hidden glass-card">
-        <ThreadView
-          threadId={threadId}
-          messages={messages}
-          membershipStatus={session.membership_status}
-          fanName={session.display_name}
-        />
-      </div>
-    </div>
+    <ThreadPageFrame
+      backHref="/dashboard/messages"
+      backLabel="← Back to messages"
+      subject={messages[0].subject}
+    >
+      <ThreadView
+        threadId={threadId}
+        messages={messages}
+        membershipStatus={session.membership_status}
+        fanName={session.display_name}
+      />
+    </ThreadPageFrame>
   );
 }

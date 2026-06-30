@@ -1,11 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Bell } from "lucide-react";
 
 export function PushPrompt() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const onMessageThread =
+    /\/messages\/[^/]+$/.test(pathname) || /\/admin\/messages\/[^/]+$/.test(pathname);
 
   useEffect(() => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
@@ -49,21 +54,27 @@ export function PushPrompt() {
     setVisible(false);
   }
 
-  if (!visible) return null;
+  if (!visible || onMessageThread) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto flex max-w-lg items-center gap-4 rounded-2xl border border-card-border bg-card p-4 shadow-xl md:left-auto md:right-6">
-      <Bell className="h-5 w-5 shrink-0 text-accent" />
-      <div className="flex-1">
-        <p className="text-sm font-medium">Enable push notifications</p>
-        <p className="text-xs text-muted">Get alerts for messages, giveaways, and events.</p>
+    <div className="fixed bottom-4 left-4 right-4 z-40 mx-auto max-w-md rounded-2xl border border-card-border bg-card p-4 shadow-xl sm:left-auto sm:right-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="flex min-w-0 flex-1 items-start gap-3">
+          <Bell className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+          <div className="min-w-0">
+            <p className="text-sm font-medium">Enable push notifications</p>
+            <p className="text-xs text-muted">Get alerts for messages, giveaways, and events.</p>
+          </div>
+        </div>
+        <div className="flex shrink-0 gap-2">
+          <button onClick={enablePush} disabled={loading} className="btn-primary px-4 py-2 text-xs">
+            {loading ? "..." : "Enable"}
+          </button>
+          <button onClick={dismiss} className="btn-ghost text-xs">
+            Later
+          </button>
+        </div>
       </div>
-      <button onClick={enablePush} disabled={loading} className="btn-primary px-4 py-2 text-xs">
-        {loading ? "..." : "Enable"}
-      </button>
-      <button onClick={dismiss} className="btn-ghost text-xs">
-        Later
-      </button>
     </div>
   );
 }

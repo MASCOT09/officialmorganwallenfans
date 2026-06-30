@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { getRepository } from "@/lib/repository";
 import { ThreadView } from "@/components/ThreadView";
+import { ThreadPageFrame } from "@/components/portal/ThreadPageFrame";
 
 export default async function AdminThreadPage({
   params,
@@ -18,20 +18,18 @@ export default async function AdminThreadPage({
   await repo.markThreadRead(threadId, "admin");
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] flex-col">
-      <Link href="/admin/messages" className="mb-4 text-sm text-accent hover:underline">
-        ← Back to fan messages
-      </Link>
-      <h1 className="font-display text-xl">{messages[0].subject}</h1>
-      <div className="mt-4 flex-1 overflow-hidden glass-card">
-        <ThreadView
-          threadId={threadId}
-          messages={messages}
-          isAdmin
-          fanName={fan?.display_name}
-          fanLastSeen={fan?.last_seen_at}
-        />
-      </div>
-    </div>
+    <ThreadPageFrame
+      backHref="/admin/messages"
+      backLabel="← Back to fan messages"
+      subject={messages[0].subject}
+    >
+      <ThreadView
+        threadId={threadId}
+        messages={messages}
+        isAdmin
+        fanName={fan?.display_name}
+        fanLastSeen={fan?.last_seen_at}
+      />
+    </ThreadPageFrame>
   );
 }
