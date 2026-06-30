@@ -61,69 +61,65 @@ export function ThreadView({
     });
   }
 
-  const showFanHeader = isAdmin && !!fanName;
-
   return (
-    <div
-      className={`grid h-full min-h-0 ${
-        showFanHeader ? "grid-rows-[auto_minmax(0,1fr)_auto]" : "grid-rows-[minmax(0,1fr)_auto]"
-      }`}
-    >
-      {showFanHeader && (
-        <div className="border-b border-card-border px-4 py-2.5 text-sm">
-          <span className="font-medium">{fanName}</span>
-          <span className="ml-3 text-muted">
-            {formatLastSeen(fanLastSeen) === "Online now" ? (
-              <span className="text-secondary">
-                <span className="online-dot mr-1.5" />
-                Online now
-              </span>
-            ) : (
-              formatLastSeen(fanLastSeen)
-            )}
-          </span>
-        </div>
-      )}
+    <div className="flex flex-col gap-5">
+      <section className="glass-card thread-history-panel">
+        {isAdmin && fanName && (
+          <div className="border-b border-card-border px-5 py-3 text-sm">
+            <span className="font-medium">{fanName}</span>
+            <span className="ml-3 text-muted">
+              {formatLastSeen(fanLastSeen) === "Online now" ? (
+                <span className="text-secondary">
+                  <span className="online-dot mr-1.5" />
+                  Online now
+                </span>
+              ) : (
+                formatLastSeen(fanLastSeen)
+              )}
+            </span>
+          </div>
+        )}
 
-      <div className="thread-messages">
-        <div className="space-y-4 pb-2">
-          {messages.map((m) => {
-            const text = visibleMessageBody(m.body);
-            const senderLabel = m.sender_role === "admin" ? TEAM_NAME : fanName ?? "You";
-            return (
-              <div
-                key={m.id}
-                className={m.sender_role === "fan" ? "chat-bubble-fan" : "chat-bubble-admin"}
-              >
-                <p className="mb-1 text-xs font-medium text-muted">{senderLabel}</p>
-                {text && <p className="whitespace-pre-wrap break-words">{text}</p>}
-                <PostImageGallery
-                  entity={m}
-                  alt="Message attachment"
-                  className="max-h-48 w-full object-cover"
-                />
-                <p className="mt-1 text-xs text-muted">
-                  {new Date(m.created_at).toLocaleString()}
-                </p>
+        <div className="thread-history-scroll">
+          <div className="space-y-5">
+            {messages.map((m) => {
+              const text = visibleMessageBody(m.body);
+              const senderLabel = m.sender_role === "admin" ? TEAM_NAME : fanName ?? "You";
+              return (
+                <article
+                  key={m.id}
+                  className={m.sender_role === "fan" ? "chat-bubble-fan" : "chat-bubble-admin"}
+                >
+                  <p className="mb-2 text-xs font-medium text-muted">{senderLabel}</p>
+                  {text && <p className="whitespace-pre-wrap break-words leading-relaxed">{text}</p>}
+                  <PostImageGallery
+                    entity={m}
+                    alt="Message attachment"
+                    className="mt-3 max-h-56 w-full object-cover"
+                  />
+                  <p className="mt-2 text-xs text-muted">
+                    {new Date(m.created_at).toLocaleString()}
+                  </p>
+                </article>
+              );
+            })}
+            {activePaymentOptions && (
+              <div className="rounded-xl border border-accent/30 bg-accent/5 p-4">
+                <p className="text-sm text-muted">Choose your payment method:</p>
+                <PaymentOptionsButtons threadId={threadId} />
               </div>
-            );
-          })}
-          {activePaymentOptions && (
-            <div className="rounded-xl border border-accent/30 bg-accent/5 p-4">
-              <p className="text-sm text-muted">Choose your payment method:</p>
-              <PaymentOptionsButtons threadId={threadId} />
-            </div>
-          )}
-          {showWelcomePlans && (
-            <WelcomeMembershipPlans membershipStatus={membershipStatus} />
-          )}
+            )}
+            {showWelcomePlans && (
+              <WelcomeMembershipPlans membershipStatus={membershipStatus} />
+            )}
+          </div>
         </div>
-      </div>
+      </section>
 
       <form
         onSubmit={handleSubmit}
         encType="multipart/form-data"
-        className="thread-compose"
+        className="glass-card thread-compose-panel"
       >
         {isAdmin && (
           <div>
@@ -132,7 +128,7 @@ export function ThreadView({
               type="text"
               readOnly
               value={TEAM_NAME}
-              className="input-field bg-card/80 py-2 text-sm"
+              className="input-field bg-card/80 text-sm"
             />
           </div>
         )}
@@ -140,13 +136,13 @@ export function ThreadView({
           <label className="label-text">Your reply</label>
           <textarea
             name="body"
-            rows={2}
+            rows={4}
             placeholder="Write your message..."
-            className="input-field resize-none py-2"
+            className="input-field resize-none"
             disabled={pending}
           />
         </div>
-        <ImageUploadField label="Attach image (optional)" compact />
+        <ImageUploadField label="Attach image (optional)" />
         {error && <p className="text-sm text-red-400">{error}</p>}
         <button type="submit" disabled={pending} className="btn-primary text-xs">
           {pending ? "Sending…" : "Send reply"}

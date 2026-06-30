@@ -77,30 +77,26 @@
   .tier-platinum { @apply bg-secondary/50 text-cream; }
 
   .chat-bubble-fan {
-    @apply ml-auto max-w-[80%] rounded-2xl rounded-br-sm bg-accent/25 px-4 py-3 text-sm leading-relaxed;
+    @apply ml-auto max-w-[92%] rounded-2xl rounded-br-sm bg-accent/20 px-5 py-4 text-sm leading-relaxed;
   }
 
   .chat-bubble-admin {
-    @apply mr-auto max-w-[85%] rounded-2xl rounded-bl-sm bg-card border border-card-border px-4 py-3 text-sm leading-relaxed;
+    @apply mr-auto max-w-[92%] rounded-2xl rounded-bl-sm border border-card-border bg-[#151c12]/80 px-5 py-4 text-sm leading-relaxed;
   }
 
-  .thread-chat-shell {
-    @apply flex flex-col;
-    height: min(78vh, calc(100dvh - 9.5rem));
-    min-height: 32rem;
+  .thread-history-panel {
+    @apply flex flex-col overflow-hidden;
+    min-height: min(62vh, calc(100dvh - 18rem));
   }
 
-  .thread-chat-inner {
-    @apply flex min-h-0 flex-1 flex-col;
-    height: 100%;
+  .thread-history-scroll {
+    @apply overflow-y-auto overscroll-contain px-5 py-5;
+    min-height: min(56vh, calc(100dvh - 22rem));
+    max-height: min(68vh, calc(100dvh - 18rem));
   }
 
-  .thread-messages {
-    @apply min-h-0 flex-1 overflow-y-auto overscroll-contain p-4;
-  }
-
-  .thread-compose {
-    @apply shrink-0 space-y-3 border-t border-card-border bg-[#151c12]/90 p-4;
+  .thread-compose-panel {
+    @apply space-y-4 p-5;
   }
 
   .online-dot {
