@@ -1,24 +1,29 @@
 export const dynamic = "force-dynamic";
 
-import { requireAdmin } from "@/lib/auth";
-import { logoutAction } from "@/actions/auth";
+import { requireAdmin, updateLastSeen } from "@/lib/auth";
+import { getRepository } from "@/lib/repository";
 import { AdminSidebar } from "@/components/AdminSidebar";
+import { PortalTopbar } from "@/components/portal/PortalTopbar";
 import { PushPrompt } from "@/components/PushPrompt";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  await requireAdmin();
+  const session = await requireAdmin();
+  await updateLastSeen(session.id);
+
+  const repo = getRepository();
+  const unreadCount = await repo.getUnreadNotificationCount(session.id);
 
   return (
-    <div className="flex min-h-screen">
-      <AdminSidebar />
-      <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-card-border px-6 py-4 lg:pl-6">
-          <p className="ml-12 font-display text-lg lg:ml-0">Admin Panel</p>
-          <form action={logoutAction}>
-            <button type="submit" className="btn-ghost text-xs">Log out</button>
-          </form>
-        </header>
-        <div className="flex-1 p-6">{children}</div>
+    <div className="flex min-h-screen bg-[#121810]">
+      <AdminSidebar user={session} />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <PortalTopbar
+          user={session}
+          unreadCount={unreadCount}
+          homeHref="/dashboard"
+          homeLabel="Fan dashboard"
+        />
+        <div className="flex-1 p-4 lg:p-6">{children}</div>
       </div>
       <PushPrompt />
     </div>

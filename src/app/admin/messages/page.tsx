@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { getRepository } from "@/lib/repository";
-import { formatLastSeen } from "@/lib/membership";
 import { AdminComposeForm } from "@/components/admin/AdminComposeForm";
+import { ThreadConversationCard } from "@/components/portal/ThreadConversationCard";
 
 export default async function AdminMessagesPage() {
   const repo = getRepository();
@@ -10,32 +9,38 @@ export default async function AdminMessagesPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="font-display text-3xl">Fan Messages</h1>
+      <div>
+        <h1 className="font-display text-3xl md:text-4xl">Fan Messages</h1>
+        <p className="mt-2 max-w-3xl text-muted">
+          Two-way inbox — reply to fan membership requests and send announcements.
+        </p>
+      </div>
+
+      <section className="glass-card p-6">
+        <h2 className="font-display text-2xl">Fan conversations</h2>
+        <p className="mt-2 text-sm text-muted">
+          Fans can message you about membership plans. Open a thread to reply, then set their badge
+          under Team &amp; Admins.
+        </p>
+
+        {threads.length === 0 ? (
+          <p className="mt-8 text-sm text-muted">No fan conversations yet.</p>
+        ) : (
+          <ul className="mt-6 space-y-4">
+            {threads.map((t) => (
+              <li key={t.thread_id}>
+                <ThreadConversationCard
+                  thread={t}
+                  href={`/admin/messages/${t.thread_id}`}
+                  variant="admin"
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <AdminComposeForm fans={fans} />
-
-      <ul className="space-y-3">
-        {threads.map((t) => (
-          <li key={t.thread_id}>
-            <Link
-              href={`/admin/messages/${t.thread_id}`}
-              className="glass-card flex items-center justify-between p-4 hover:border-accent/30"
-            >
-              <div>
-                <p className="font-medium">{t.fan_display_name ?? "Fan"} — {t.subject}</p>
-                <p className="text-xs text-muted">
-                  {formatLastSeen(t.fan_last_seen_at)}
-                </p>
-              </div>
-              {t.unread_count > 0 && (
-                <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-background">
-                  {t.unread_count}
-                </span>
-              )}
-            </Link>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

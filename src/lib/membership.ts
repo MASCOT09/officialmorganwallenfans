@@ -1,4 +1,4 @@
-import type { MembershipTier, SessionUser } from "./types";
+import type { MembershipStatus, MembershipTier, SessionUser } from "./types";
 
 export const MEMBERSHIP_TIERS = {
   none: { label: "None", price: 0, perks: ["Browse only", "Ticket purchase with account"] },
@@ -87,6 +87,17 @@ export function formatLastSeen(lastSeenAt: string | null | undefined): string {
   const hours = Math.floor(mins / 60);
   if (hours < 24) return `Last online ${hours}h ago`;
   return `Last online ${new Date(lastSeenAt).toLocaleDateString()}`;
+}
+
+export function membershipDisplayLabel(
+  tier: MembershipTier,
+  status: MembershipStatus,
+): string {
+  if (status === "approved" && tier !== "none") {
+    return `${MEMBERSHIP_TIERS[tier].label} membership`;
+  }
+  if (status === "pending") return "Pending approval";
+  return "No membership";
 }
 
 export const SITE_NAME = "Morgan Wallen";

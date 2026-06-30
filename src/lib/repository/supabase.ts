@@ -52,7 +52,14 @@ function throwIfError<T>(label: string, result: { data: T; error: { message: str
 function toMessageThread(
   threadId: string,
   messages: Message[],
-  extras?: { fan_display_name?: string; fan_last_seen_at?: string | null },
+  extras?: Pick<
+    MessageThread,
+    | "fan_display_name"
+    | "fan_last_seen_at"
+    | "fan_email"
+    | "fan_membership_tier"
+    | "fan_membership_status"
+  >,
 ): MessageThread {
   const sorted = [...messages].sort(
     (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
@@ -615,7 +622,16 @@ class SupabaseRepository implements Repository {
     messages: Message[],
     unreadSenderRole: "fan" | "admin",
     userFilter?: string,
-    fanInfo?: Map<string, { display_name: string; last_seen_at: string | null }>,
+    fanInfo?: Map<
+      string,
+      {
+        display_name: string;
+        last_seen_at: string | null;
+        email?: string;
+        membership_tier?: MessageThread["fan_membership_tier"];
+        membership_status?: MessageThread["fan_membership_status"];
+      }
+    >,
   ): MessageThread[] {
     const filtered = userFilter ? messages.filter((m) => m.user_id === userFilter) : messages;
     const grouped = this.groupMessagesByThread(filtered);
@@ -626,6 +642,9 @@ class SupabaseRepository implements Repository {
       const thread = toMessageThread(threadId, threadMessages, {
         fan_display_name: fan?.display_name,
         fan_last_seen_at: fan?.last_seen_at,
+        fan_email: fan?.email,
+        fan_membership_tier: fan?.membership_tier,
+        fan_membership_status: fan?.membership_status,
       });
       thread.unread_count = threadMessages.filter(
         (m) => m.sender_role === unreadSenderRole && !m.is_read,
@@ -665,22 +684,37 @@ class SupabaseRepository implements Repository {
     const messages = throwIfError("getAllThreads", messagesResult) as Message[];
 
     const userIds = [...new Set(messages.map((m) => m.user_id))];
-    const fanInfo = new Map<string, { display_name: string; last_seen_at: string | null }>();
+    const fanInfo = new Map<
+      string,
+      {
+        display_name: string;
+        last_seen_at: string | null;
+        email: string;
+        membership_tier: MessageThread["fan_membership_tier"];
+        membership_status: MessageThread["fan_membership_status"];
+      }
+    >();
 
     if (userIds.length > 0) {
       const fansResult = await this.client
         .from("app_users")
-        .select("id, display_name, last_seen_at")
+        .select("id, display_name, last_seen_at, email, membership_tier, membership_status")
         .in("id", userIds);
       const fans = throwIfError("getAllThreads fans", fansResult) as {
         id: string;
         display_name: string;
         last_seen_at: string | null;
+        email: string;
+        membership_tier: MessageThread["fan_membership_tier"];
+        membership_status: MessageThread["fan_membership_status"];
       }[];
       for (const fan of fans) {
         fanInfo.set(fan.id, {
           display_name: fan.display_name,
           last_seen_at: fan.last_seen_at,
+          email: fan.email,
+          membership_tier: fan.membership_tier,
+          membership_status: fan.membership_status,
         });
       }
     }

@@ -1,12 +1,12 @@
 "use client";
 
 import { useActionState } from "react";
-import Link from "next/link";
 import { MessageSquare } from "lucide-react";
 import { createThreadAction } from "@/actions/fan";
 import { EmptyState } from "@/components/EmptyState";
 import { ImageUploadField } from "@/components/ImageUploadField";
 import { FormSubmitButton } from "@/components/FormSubmitButton";
+import { ThreadConversationCard } from "@/components/portal/ThreadConversationCard";
 import type { MessageThread } from "@/lib/types";
 
 export function MessagesClient({ threads }: { threads: MessageThread[] }) {
@@ -20,47 +20,56 @@ export function MessagesClient({ threads }: { threads: MessageThread[] }) {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-3xl">My Messages</h1>
-        <p className="text-muted">Chat with the Morgan Wallen Fan Team.</p>
+        <h1 className="font-display text-3xl md:text-4xl">Fan Messages</h1>
+        <p className="mt-2 text-muted">
+          Two-way inbox — chat with the Morgan Wallen Fan Team about membership, tickets, and more.
+        </p>
       </div>
 
       <form action={action} encType="multipart/form-data" className="glass-card space-y-4 p-6">
         <h2 className="font-display text-lg">Start a new conversation</h2>
-        <input name="subject" placeholder="Subject" required className="input-field" />
-        <textarea name="body" rows={4} placeholder="Your message..." className="input-field resize-none" />
-        <ImageUploadField label="Attach images (optional)" />
+        <div>
+          <label className="label-text">Subject</label>
+          <input name="subject" placeholder="What is this about?" required className="input-field" />
+        </div>
+        <div>
+          <label className="label-text">Your message</label>
+          <textarea
+            name="body"
+            rows={4}
+            placeholder="Write your message..."
+            className="input-field resize-none"
+          />
+        </div>
+        <ImageUploadField label="Attach image (optional)" />
         {state.error && <p className="text-sm text-red-400">{state.error}</p>}
         <FormSubmitButton label="Send message" pendingLabel="Sending…" />
       </form>
 
-      {threads.length === 0 ? (
-        <EmptyState
-          icon={MessageSquare}
-          title="No messages yet"
-          description="Start a conversation with the Morgan Wallen Fan Team above."
-        />
-      ) : (
-        <ul className="space-y-3">
-          {threads.map((t) => (
-            <li key={t.thread_id}>
-              <Link
-                href={`/dashboard/messages/${t.thread_id}`}
-                className="glass-card flex items-center justify-between p-4 transition-colors hover:border-accent/30"
-              >
-                <div>
-                  <p className="font-medium">{t.subject}</p>
-                  <p className="mt-1 truncate text-sm text-muted">{t.last_message}</p>
-                </div>
-                {t.unread_count > 0 && (
-                  <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-accent px-2 text-xs font-bold text-background">
-                    {t.unread_count}
-                  </span>
-                )}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      <section className="glass-card p-6">
+        <h2 className="font-display text-xl">Your conversations</h2>
+        {threads.length === 0 ? (
+          <div className="mt-6">
+            <EmptyState
+              icon={MessageSquare}
+              title="No messages yet"
+              description="Start a conversation with the Morgan Wallen Fan Team above."
+            />
+          </div>
+        ) : (
+          <ul className="mt-6 space-y-4">
+            {threads.map((t) => (
+              <li key={t.thread_id}>
+                <ThreadConversationCard
+                  thread={t}
+                  href={`/dashboard/messages/${t.thread_id}`}
+                  variant="fan"
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

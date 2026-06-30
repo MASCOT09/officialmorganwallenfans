@@ -167,6 +167,9 @@ export interface MessageThread {
   status: MessageStatus;
   fan_display_name?: string;
   fan_last_seen_at?: string | null;
+  fan_email?: string;
+  fan_membership_tier?: MembershipTier;
+  fan_membership_status?: MembershipStatus;
 }
 
 export interface Notification {

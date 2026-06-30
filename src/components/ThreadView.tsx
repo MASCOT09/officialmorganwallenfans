@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { replyThreadAction } from "@/actions/fan";
 import { adminReplyAction } from "@/actions/admin";
 import type { Message } from "@/lib/types";
-import { formatLastSeen } from "@/lib/membership";
+import { formatLastSeen, TEAM_NAME } from "@/lib/membership";
 import { getActivePaymentOptions, visibleMessageBody } from "@/lib/payment-inbox-shared";
 import { isWelcomeThreadSubject } from "@/lib/welcome-message";
 import { ImageUploadField } from "@/components/ImageUploadField";
@@ -81,11 +81,13 @@ export function ThreadView({
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {messages.map((m) => {
           const text = visibleMessageBody(m.body);
+          const senderLabel = m.sender_role === "admin" ? TEAM_NAME : fanName ?? "You";
           return (
             <div
               key={m.id}
               className={m.sender_role === "fan" ? "chat-bubble-fan" : "chat-bubble-admin"}
             >
+              <p className="mb-1 text-xs font-medium text-muted">{senderLabel}</p>
               {text && <p className="whitespace-pre-wrap">{text}</p>}
               <PostImageGallery entity={m} alt="Message attachment" className="max-h-48 w-full object-cover" />
               <p className="mt-1 text-xs text-muted">
@@ -104,19 +106,37 @@ export function ThreadView({
           <WelcomeMembershipPlans membershipStatus={membershipStatus} />
         )}
       </div>
-      <form onSubmit={handleSubmit} encType="multipart/form-data" className="border-t border-card-border p-4">
-        <textarea
-          name="body"
-          rows={3}
-          placeholder="Type your reply..."
-          className="input-field resize-none"
-          disabled={pending}
-        />
+      <form
+        onSubmit={handleSubmit}
+        encType="multipart/form-data"
+        className="border-t border-card-border bg-[#151c12]/50 p-4"
+      >
+        {isAdmin && (
+          <div className="mb-4">
+            <label className="label-text">From name</label>
+            <input
+              type="text"
+              readOnly
+              value={TEAM_NAME}
+              className="input-field bg-card/80 text-sm"
+            />
+          </div>
+        )}
+        <div>
+          <label className="label-text">Your reply</label>
+          <textarea
+            name="body"
+            rows={4}
+            placeholder="Write your message..."
+            className="input-field resize-none"
+            disabled={pending}
+          />
+        </div>
         <div className="mt-3">
-          <ImageUploadField label="Attach images (optional)" />
+          <ImageUploadField label="Attach image (optional)" />
         </div>
         {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
-        <button type="submit" disabled={pending} className="btn-primary mt-3 text-xs">
+        <button type="submit" disabled={pending} className="btn-primary mt-4 text-xs">
           {pending ? "Sending…" : "Send reply"}
         </button>
       </form>
