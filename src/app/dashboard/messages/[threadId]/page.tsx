@@ -26,7 +26,7 @@ export default async function ThreadPage({
       </Link>
       <h1 className="font-display text-xl">{messages[0].subject}</h1>
       <div className="mt-4 flex-1 overflow-hidden glass-card">
-        <ThreadView threadId={threadId} messages={messages} />
+        <ThreadView threadId={threadId} messages={messages} membershipStatus={session.membership_status} />
       </div>
     </div>
   );

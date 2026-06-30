@@ -17,7 +17,7 @@ import { getRepository } from "@/lib/repository";
 import { sendWelcomeEmail, sendAdminSignupAlert } from "@/lib/email";
 import { notifyAdmins, notifyUser } from "@/lib/notify";
 import { sendPushToAdmins } from "@/lib/push";
-import { TEAM_NAME } from "@/lib/membership";
+import { buildSignupWelcomeMessage, WELCOME_THREAD_SUBJECT } from "@/lib/welcome-message";
 import type { SessionUser } from "@/lib/types";
 
 export type ActionResult = { success: boolean; error?: string; suggestion?: string };
@@ -82,8 +82,8 @@ export async function signupAction(formData: FormData): Promise<ActionResult> {
     id: uuidv4(),
     thread_id: threadId,
     user_id: userId,
-    subject: `Welcome to the ${TEAM_NAME}!`,
-    body: `Hey ${displayName}! Welcome to the official Morgan Wallen fan community. We're glad you're here. Check out giveaways, events, and membership perks from your dashboard.`,
+    subject: WELCOME_THREAD_SUBJECT,
+    body: buildSignupWelcomeMessage(displayName),
     image_url: null,
     image_urls: null,
     sender_role: "admin",
@@ -94,8 +94,8 @@ export async function signupAction(formData: FormData): Promise<ActionResult> {
   await notifyUser(
     userId,
     "Welcome to the fan community!",
-    "Your account is ready. Explore your dashboard for giveaways and events.",
-    "/dashboard",
+    "Your account is ready. Open your inbox to view membership plans and message the team.",
+    `/dashboard/messages/${threadId}`,
   );
 
   after(async () => {
@@ -109,7 +109,7 @@ export async function signupAction(formData: FormData): Promise<ActionResult> {
     });
   });
 
-  redirect(getSafeRedirectPath(String(formData.get("redirect") ?? ""), user.role));
+  redirect(`/dashboard/messages/${threadId}`);
 }
 
 export async function loginAction(formData: FormData): Promise<ActionResult> {

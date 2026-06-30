@@ -4,6 +4,12 @@ import { SITE_NAME, TEAM_NAME } from "./membership";
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const FROM = process.env.EMAIL_FROM ?? "Morgan Wallen Fan <onboarding@resend.dev>";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const DEFAULT_ADMIN_ALERT_EMAIL = "emmanuelolugoke@gmail.com";
+
+function adminAlertRecipients(): string[] {
+  const raw = process.env.ADMIN_ALERT_EMAIL ?? DEFAULT_ADMIN_ALERT_EMAIL;
+  return raw.split(",").map((e) => e.trim()).filter(Boolean);
+}
 
 export async function sendEmail(
   to: string | string[],
@@ -50,24 +56,20 @@ export async function sendWelcomeEmail(to: string, name: string) {
 }
 
 export async function sendAdminSignupAlert(fanEmail: string, fanName: string) {
-  const admins = process.env.ADMIN_ALERT_EMAIL;
-  if (!admins) return false;
   return sendEmail(
-    admins.split(",").map((e) => e.trim()),
-    `New fan signup: ${fanName}`,
+    adminAlertRecipients(),
+    `New member signed up — ${SITE_NAME} Official Fan Site`,
     layout(`
-      <h1 style="color:#F0F3EC;">New fan joined</h1>
-      <p><strong>${fanName}</strong> (${fanEmail}) just created an account.</p>
+      <h1 style="color:#F0F3EC;">New member signed up</h1>
+      <p><strong>${fanName}</strong> (${fanEmail}) just joined the ${SITE_NAME} official fan community.</p>
       <p><a href="${SITE_URL}/admin" style="color:#7A9A6E;">Open admin panel →</a></p>
     `),
   );
 }
 
 export async function sendMembershipApplicationAlert(fanName: string, tier: string) {
-  const admins = process.env.ADMIN_ALERT_EMAIL;
-  if (!admins) return false;
   return sendEmail(
-    admins.split(",").map((e) => e.trim()),
+    adminAlertRecipients(),
     `Membership application: ${fanName} (${tier})`,
     layout(`
       <h1 style="color:#F0F3EC;">New membership application</h1>
@@ -89,15 +91,26 @@ export async function sendMembershipUpgradeEmail(to: string, name: string, tier:
   );
 }
 
-export async function sendNewMessageAlert(to: string, name: string, isAdmin: boolean) {
-  const link = isAdmin ? `${SITE_URL}/admin/messages` : `${SITE_URL}/dashboard/messages`;
+export async function sendNewMessageAlert(
+  to: string,
+  name: string,
+  isAdmin: boolean,
+  threadId?: string,
+) {
+  const link = isAdmin
+    ? threadId
+      ? `${SITE_URL}/admin/messages/${threadId}`
+      : `${SITE_URL}/admin/messages`
+    : threadId
+      ? `${SITE_URL}/dashboard/messages/${threadId}`
+      : `${SITE_URL}/dashboard/messages`;
   return sendEmail(
     to,
-    `New message on ${SITE_NAME} fan community`,
+    `New message from the ${TEAM_NAME}`,
     layout(`
       <h1 style="color:#F0F3EC;">Hi ${name},</h1>
-      <p>You have a new message waiting in your inbox. Log in to read and reply.</p>
-      <p><a href="${link}" style="color:#7A9A6E;">Open messages →</a></p>
+      <p>The ${TEAM_NAME} sent you a new message. Log in to read and reply.</p>
+      <p><a href="${link}" style="color:#7A9A6E;">Open conversation →</a></p>
     `),
   );
 }

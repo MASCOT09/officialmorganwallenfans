@@ -465,7 +465,7 @@ export async function adminReplyAction(threadId: string, formData: FormData): Pr
 
   const fan = await repo.getUserById(fanId);
   if (fan) {
-    await notifyFanNewMessage(fanId, fan.email, fan.display_name);
+    await notifyFanNewMessage(fanId, fan.email, fan.display_name, threadId);
   }
 
   revalidatePath(`/admin/messages/${threadId}`);
@@ -510,7 +510,7 @@ export async function adminComposeAction(formData: FormData): Promise<ActionResu
     });
     if (sendNotification) {
       const fan = await repo.getUserById(fanId);
-      if (fan) await notifyFanNewMessage(fanId, fan.email, fan.display_name);
+      if (fan) await notifyFanNewMessage(fanId, fan.email, fan.display_name, threadId);
     }
   }
 

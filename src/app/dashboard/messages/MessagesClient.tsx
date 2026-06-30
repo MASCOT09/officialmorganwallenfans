@@ -30,7 +30,6 @@ export function MessagesClient({ threads }: { threads: MessageThread[] }) {
         <textarea name="body" rows={4} placeholder="Your message..." className="input-field resize-none" />
         <ImageUploadField label="Attach images (optional)" />
         {state.error && <p className="text-sm text-red-400">{state.error}</p>}
-        {state.success && <p className="text-sm text-secondary">Message sent!</p>}
         <FormSubmitButton label="Send message" pendingLabel="Sending…" />
       </form>
 

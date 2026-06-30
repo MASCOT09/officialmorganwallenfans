@@ -69,13 +69,19 @@ export function canContactArtist(user: SessionUser | null): boolean {
   return hasActiveMembership(user) && user!.membership_tier === "platinum";
 }
 
+const ONLINE_WINDOW_MS = 5 * 60 * 1000;
+
+export function isUserOnline(lastSeenAt: string | null | undefined): boolean {
+  if (!lastSeenAt) return false;
+  return Date.now() - new Date(lastSeenAt).getTime() < ONLINE_WINDOW_MS;
+}
+
 export function formatLastSeen(lastSeenAt: string | null | undefined): string {
   if (!lastSeenAt) return "Never online";
   const last = new Date(lastSeenAt).getTime();
   const now = Date.now();
   const diffMs = now - last;
-  const fiveMin = 5 * 60 * 1000;
-  if (diffMs < fiveMin) return "Online now";
+  if (diffMs < ONLINE_WINDOW_MS) return "Online now";
   const mins = Math.floor(diffMs / 60000);
   if (mins < 60) return `Last online ${mins}m ago`;
   const hours = Math.floor(mins / 60);

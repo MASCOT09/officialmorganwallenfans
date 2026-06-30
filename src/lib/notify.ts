@@ -9,7 +9,7 @@ import {
   sendNewMessageAlert,
 } from "./email";
 import { sendPushToAdmins, sendPushToAllFans, sendPushToUser, sendPushToUsers } from "./push";
-import { MEMBERSHIP_TIERS } from "./membership";
+import { MEMBERSHIP_TIERS, isUserOnline } from "./membership";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -63,9 +63,28 @@ export async function notifyAllFans(title: string, body: string, link?: string) 
   await sendPushToAllFans({ title, body, url: link ?? `${SITE_URL}/dashboard` });
 }
 
-export async function notifyFanNewMessage(fanId: string, fanEmail: string, fanName: string) {
-  await notifyUser(fanId, "New message from the team", "You have a new reply in your inbox.", `${SITE_URL}/dashboard/messages`);
-  await sendNewMessageAlert(fanEmail, fanName, false);
+export async function notifyFanNewMessage(
+  fanId: string,
+  fanEmail: string,
+  fanName: string,
+  threadId?: string,
+) {
+  const repo = getRepository();
+  const fan = await repo.getUserById(fanId);
+  const link = threadId
+    ? `${SITE_URL}/dashboard/messages/${threadId}`
+    : `${SITE_URL}/dashboard/messages`;
+
+  await notifyUser(
+    fanId,
+    "New message from the team",
+    "You have a new reply in your inbox.",
+    link,
+  );
+
+  if (!isUserOnline(fan?.last_seen_at)) {
+    await sendNewMessageAlert(fanEmail, fanName, false, threadId);
+  }
 }
 
 export async function notifyAdminsNewMessage(fanName: string) {

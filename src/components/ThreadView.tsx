@@ -7,9 +7,12 @@ import { adminReplyAction } from "@/actions/admin";
 import type { Message } from "@/lib/types";
 import { formatLastSeen } from "@/lib/membership";
 import { getActivePaymentOptions, visibleMessageBody } from "@/lib/payment-inbox-shared";
+import { isWelcomeThreadSubject } from "@/lib/welcome-message";
 import { ImageUploadField } from "@/components/ImageUploadField";
 import { PostImageGallery } from "@/components/PostImageGallery";
 import { PaymentOptionsButtons } from "@/components/PaymentOptionsButtons";
+import { WelcomeMembershipPlans } from "@/components/WelcomeMembershipPlans";
+import type { MembershipStatus } from "@/lib/types";
 
 interface ThreadViewProps {
   threadId: string;
@@ -17,6 +20,7 @@ interface ThreadViewProps {
   isAdmin?: boolean;
   fanLastSeen?: string | null;
   fanName?: string;
+  membershipStatus?: MembershipStatus;
 }
 
 export function ThreadView({
@@ -25,11 +29,14 @@ export function ThreadView({
   isAdmin = false,
   fanLastSeen,
   fanName,
+  membershipStatus = "none",
 }: ThreadViewProps) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const activePaymentOptions = !isAdmin ? getActivePaymentOptions(messages) : null;
+  const showWelcomePlans =
+    !isAdmin && messages.length > 0 && isWelcomeThreadSubject(messages[0].subject);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -92,6 +99,9 @@ export function ThreadView({
             <p className="text-sm text-muted">Choose your payment method:</p>
             <PaymentOptionsButtons threadId={threadId} />
           </div>
+        )}
+        {showWelcomePlans && (
+          <WelcomeMembershipPlans membershipStatus={membershipStatus} />
         )}
       </div>
       <form onSubmit={handleSubmit} encType="multipart/form-data" className="border-t border-card-border p-4">

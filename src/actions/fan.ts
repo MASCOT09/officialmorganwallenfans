@@ -221,7 +221,7 @@ export async function createThreadAction(formData: FormData): Promise<ActionResu
   });
 
   revalidatePath("/dashboard/messages");
-  return { success: true };
+  redirect(`/dashboard/messages/${threadId}`);
 }
 
 export async function replyThreadAction(threadId: string, formData: FormData): Promise<ActionResult> {
