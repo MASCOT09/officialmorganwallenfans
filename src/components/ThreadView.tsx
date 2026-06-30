@@ -61,10 +61,16 @@ export function ThreadView({
     });
   }
 
+  const showFanHeader = isAdmin && !!fanName;
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      {isAdmin && fanName && (
-        <div className="shrink-0 border-b border-card-border px-4 py-3 text-sm">
+    <div
+      className={`grid h-full min-h-0 ${
+        showFanHeader ? "grid-rows-[auto_minmax(0,1fr)_auto]" : "grid-rows-[minmax(0,1fr)_auto]"
+      }`}
+    >
+      {showFanHeader && (
+        <div className="border-b border-card-border px-4 py-2.5 text-sm">
           <span className="font-medium">{fanName}</span>
           <span className="ml-3 text-muted">
             {formatLastSeen(fanLastSeen) === "Online now" ? (
@@ -79,8 +85,8 @@ export function ThreadView({
         </div>
       )}
 
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
-        <div className="space-y-4">
+      <div className="thread-messages">
+        <div className="space-y-4 pb-2">
           {messages.map((m) => {
             const text = visibleMessageBody(m.body);
             const senderLabel = m.sender_role === "admin" ? TEAM_NAME : fanName ?? "You";
@@ -117,24 +123,30 @@ export function ThreadView({
       <form
         onSubmit={handleSubmit}
         encType="multipart/form-data"
-        className="shrink-0 space-y-3 border-t border-card-border bg-[#151c12]/80 p-4"
+        className="thread-compose"
       >
         {isAdmin && (
-          <p className="text-xs text-muted">
-            Replying as <span className="font-medium text-foreground">{TEAM_NAME}</span>
-          </p>
+          <div>
+            <label className="label-text">From name</label>
+            <input
+              type="text"
+              readOnly
+              value={TEAM_NAME}
+              className="input-field bg-card/80 py-2 text-sm"
+            />
+          </div>
         )}
         <div>
           <label className="label-text">Your reply</label>
           <textarea
             name="body"
-            rows={3}
+            rows={2}
             placeholder="Write your message..."
-            className="input-field resize-none"
+            className="input-field resize-none py-2"
             disabled={pending}
           />
         </div>
-        <ImageUploadField label="Attach image (optional)" />
+        <ImageUploadField label="Attach image (optional)" compact />
         {error && <p className="text-sm text-red-400">{error}</p>}
         <button type="submit" disabled={pending} className="btn-primary text-xs">
           {pending ? "Sending…" : "Send reply"}

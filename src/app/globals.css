@@ -81,7 +81,26 @@
   }
 
   .chat-bubble-admin {
-    @apply mr-auto max-w-[80%] rounded-2xl rounded-bl-sm bg-card border border-card-border px-4 py-3 text-sm leading-relaxed;
+    @apply mr-auto max-w-[85%] rounded-2xl rounded-bl-sm bg-card border border-card-border px-4 py-3 text-sm leading-relaxed;
+  }
+
+  .thread-chat-shell {
+    @apply flex flex-col;
+    height: min(78vh, calc(100dvh - 9.5rem));
+    min-height: 32rem;
+  }
+
+  .thread-chat-inner {
+    @apply flex min-h-0 flex-1 flex-col;
+    height: 100%;
+  }
+
+  .thread-messages {
+    @apply min-h-0 flex-1 overflow-y-auto overscroll-contain p-4;
+  }
+
+  .thread-compose {
+    @apply shrink-0 space-y-3 border-t border-card-border bg-[#151c12]/90 p-4;
   }
 
   .online-dot {

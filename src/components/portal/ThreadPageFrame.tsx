@@ -14,13 +14,13 @@ export function ThreadPageFrame({
   children,
 }: ThreadPageFrameProps) {
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-3 pb-6">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 pb-4">
       <Link href={backHref} className="text-sm text-accent hover:underline">
         {backLabel}
       </Link>
       <h1 className="font-display text-xl md:text-2xl">{subject}</h1>
-      <div className="glass-card flex h-[min(72vh,calc(100dvh-14rem))] min-h-[28rem] flex-col overflow-hidden">
-        {children}
+      <div className="glass-card thread-chat-shell overflow-hidden">
+        <div className="thread-chat-inner">{children}</div>
       </div>
     </div>
   );

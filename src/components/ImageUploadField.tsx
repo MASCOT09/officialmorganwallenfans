@@ -7,12 +7,14 @@ interface ImageUploadFieldProps {
   name?: string;
   label?: string;
   multiple?: boolean;
+  compact?: boolean;
 }
 
 export function ImageUploadField({
   name = "images",
   label = "Images (optional)",
   multiple = true,
+  compact = false,
 }: ImageUploadFieldProps) {
   const [previews, setPreviews] = useState<string[]>([]);
 
@@ -49,17 +51,17 @@ export function ImageUploadField({
           ).then(setPreviews);
         }}
       />
-      <p className="mt-1 text-xs text-muted">
-        JPG, PNG, or WebP · max 2MB each · up to {MAX_IMAGES_PER_POST} images
+      <p className={`text-xs text-muted ${compact ? "mt-1" : "mt-1"}`}>
+        {compact ? "JPG, PNG, or WebP · max 2MB" : `JPG, PNG, or WebP · max 2MB each · up to ${MAX_IMAGES_PER_POST} images`}
       </p>
       {previews.length > 0 && (
-        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <div className={`mt-3 grid gap-2 ${compact ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-3"}`}>
           {previews.map((src, index) => (
             <img
               key={`${src.slice(0, 32)}-${index}`}
               src={src}
               alt={`Preview ${index + 1}`}
-              className="max-h-32 w-full rounded-lg border border-card-border object-cover"
+              className={`w-full rounded-lg border border-card-border object-cover ${compact ? "max-h-20" : "max-h-32"}`}
             />
           ))}
         </div>
