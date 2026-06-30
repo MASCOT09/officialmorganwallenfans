@@ -1,5 +1,5 @@
 -- Morgan Wallen Fan Site — production schema (core tables)
--- RLS disabled; server uses service role only.
+-- RLS enabled; server uses service role only (bypasses RLS).
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
@@ -25,7 +25,7 @@ CREATE INDEX idx_app_users_role ON app_users (role);
 CREATE INDEX idx_app_users_membership_tier ON app_users (membership_tier);
 CREATE INDEX idx_app_users_country ON app_users (country);
 
-ALTER TABLE app_users DISABLE ROW LEVEL SECURITY;
+ALTER TABLE app_users ENABLE ROW LEVEL SECURITY;
 
 -- ---------------------------------------------------------------------------
 -- site_settings (singleton row)
@@ -38,7 +38,7 @@ CREATE TABLE site_settings (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
-ALTER TABLE site_settings DISABLE ROW LEVEL SECURITY;
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
 
 INSERT INTO site_settings (id, celebrity_name, tagline, hero_video_url, updated_at)
 VALUES (
@@ -64,7 +64,7 @@ CREATE TABLE giveaways (
 
 CREATE INDEX idx_giveaways_status ON giveaways (status);
 
-ALTER TABLE giveaways DISABLE ROW LEVEL SECURITY;
+ALTER TABLE giveaways ENABLE ROW LEVEL SECURITY;
 
 -- ---------------------------------------------------------------------------
 -- giveaway_entries
@@ -80,7 +80,7 @@ CREATE TABLE giveaway_entries (
 CREATE INDEX idx_giveaway_entries_user_id ON giveaway_entries (user_id);
 CREATE INDEX idx_giveaway_entries_giveaway_id ON giveaway_entries (giveaway_id);
 
-ALTER TABLE giveaway_entries DISABLE ROW LEVEL SECURITY;
+ALTER TABLE giveaway_entries ENABLE ROW LEVEL SECURITY;
 
 -- ---------------------------------------------------------------------------
 -- meet_greet
@@ -98,7 +98,7 @@ CREATE TABLE meet_greet (
 
 CREATE INDEX idx_meet_greet_status ON meet_greet (status);
 
-ALTER TABLE meet_greet DISABLE ROW LEVEL SECURITY;
+ALTER TABLE meet_greet ENABLE ROW LEVEL SECURITY;
 
 -- ---------------------------------------------------------------------------
 -- meet_greet_registrations
@@ -115,7 +115,7 @@ CREATE TABLE meet_greet_registrations (
 CREATE INDEX idx_meet_greet_registrations_user_id ON meet_greet_registrations (user_id);
 CREATE INDEX idx_meet_greet_registrations_event_id ON meet_greet_registrations (event_id);
 
-ALTER TABLE meet_greet_registrations DISABLE ROW LEVEL SECURITY;
+ALTER TABLE meet_greet_registrations ENABLE ROW LEVEL SECURITY;
 
 -- ---------------------------------------------------------------------------
 -- communities
@@ -132,7 +132,7 @@ CREATE TABLE communities (
 
 CREATE INDEX idx_communities_sort_order ON communities (sort_order);
 
-ALTER TABLE communities DISABLE ROW LEVEL SECURITY;
+ALTER TABLE communities ENABLE ROW LEVEL SECURITY;
 
 -- ---------------------------------------------------------------------------
 -- contact_links
@@ -148,7 +148,7 @@ CREATE TABLE contact_links (
 
 CREATE INDEX idx_contact_links_recipient ON contact_links (recipient);
 
-ALTER TABLE contact_links DISABLE ROW LEVEL SECURITY;
+ALTER TABLE contact_links ENABLE ROW LEVEL SECURITY;
 
 -- ---------------------------------------------------------------------------
 -- messages (thread_id and sender_role added in 004_message_threads.sql)
@@ -166,7 +166,7 @@ CREATE TABLE messages (
 CREATE INDEX idx_messages_user_id ON messages (user_id);
 CREATE INDEX idx_messages_created_at ON messages (created_at DESC);
 
-ALTER TABLE messages DISABLE ROW LEVEL SECURITY;
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 
 -- ---------------------------------------------------------------------------
 -- notifications
@@ -184,7 +184,7 @@ CREATE TABLE notifications (
 CREATE INDEX idx_notifications_user_id ON notifications (user_id);
 CREATE INDEX idx_notifications_user_unread ON notifications (user_id) WHERE is_read = false;
 
-ALTER TABLE notifications DISABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
 -- ---------------------------------------------------------------------------
 -- membership_applications
@@ -202,4 +202,4 @@ CREATE TABLE membership_applications (
 CREATE INDEX idx_membership_applications_user_id ON membership_applications (user_id);
 CREATE INDEX idx_membership_applications_status ON membership_applications (status);
 
-ALTER TABLE membership_applications DISABLE ROW LEVEL SECURITY;
+ALTER TABLE membership_applications ENABLE ROW LEVEL SECURITY;
